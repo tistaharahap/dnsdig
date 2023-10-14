@@ -46,10 +46,10 @@ async def user() -> User:
 class FakeContext:
     def __init__(
         self,
-        access_token: str,
-        permissions: List[Permissions],
-        mongo_session: motor_asyncio.AsyncIOMotorClientSession,
-        current_user: User,
+        access_token: str | None = None,
+        permissions: List[Permissions] | None = None,
+        mongo_session: motor_asyncio.AsyncIOMotorClientSession | None = None,
+        current_user: User | None = None,
     ):
         self.access_token = access_token
         self.permissions = permissions
@@ -73,6 +73,11 @@ class FakeContext:
             current_user=kwargs.get("current_user"),
         )
 
+    @classmethod
+    @asynccontextmanager
+    async def public(cls, mongo_session: motor_asyncio.AsyncIOMotorClientSession | None = None):
+        yield cls(mongo_session=mongo_session)
+
 
 @pytest_asyncio.fixture(autouse=True)
 async def nullify_auth(monkeypatch, user: User):
@@ -80,6 +85,7 @@ async def nullify_auth(monkeypatch, user: User):
         "dnsdig.libshared.context.Context.protected",
         lambda *args, **kwargs: FakeContext.protected(*args, **kwargs, current_user=user),
     )
+    monkeypatch.setattr("dnsdig.libshared.context.Context.public", FakeContext.public)
 
 
 @pytest.fixture(scope="session")
