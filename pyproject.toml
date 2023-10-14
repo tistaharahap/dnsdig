@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "dnsdig"
+version = "0.1.0"
+description = "The API for DNS lookups"
+authors = ["Batista Harahap <batista@bango29.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.103.2"
+pydantic = {extras = ["email"], version = "^2.4.2"}
+dnspython = "^2.4.2"
+pyhumps = "^3.8.0"
+uvicorn = "^0.23.2"
+beanie = "^1.22.6"
+pydantic-settings = "^2.0.3"
+asyncer = "^0.0.2"
+aiohttp = "^3.8.6"
+pyjwt = "^2.8.0"
+ujson = "^5.8.0"
+cryptography = "^41.0.4"
+email-validator = "^2.0.0.post2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.2"
+pytest-asyncio = "^0.21.1"
+black = "^23.9.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+skip-string-normalization = true
+skip-magic-trailing-comma = true
+exclude = '''
+    /(
+        \.git
+      | \.hg
+      | \.mypy_cache
+      | \.tox
+      | \.venv
+      | _build
+      | buck-out
+      | build
+      | dist
+      # The following are specific to Black, you probably don't want those.
+      | blib2to3
+      | tests/data
+    )/
+'''
