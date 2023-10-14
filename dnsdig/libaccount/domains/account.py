@@ -94,22 +94,27 @@ class Account:
         )
 
     @classmethod
-    async def exchange_code_for_token(cls, code: str, state: str) -> AccessTokenResponse:
-        query = {"state": state, "deleted_at": {"$eq": None}}
-        session = await monq_find_one(model=OAuthSession, query=query, project_to=OAuthSession)
-        if not session:
-            raise HTTPException(status_code=400, detail="Invalid state")
+    async def exchange_for_access_token(
+        cls, code: str, state: str | None = None, refresh_exchange: bool = False
+    ) -> AccessTokenResponse:
+        if state and not refresh_exchange:
+            # Exchanging authorization code for an access token
+            query = {"state": state, "deleted_at": {"$eq": None}}
+            session = await monq_find_one(model=OAuthSession, query=query, project_to=OAuthSession)
+            if not session:
+                raise HTTPException(status_code=400, detail="Invalid state")
 
-        # Mark session as deleted
-        session.deleted_at = datetime.utcnow()
-        await session.save()
+            # Mark session as deleted
+            session.deleted_at = datetime.utcnow()
+            await session.save()
 
         data = {
             "client_id": settings.auth_provider_client_id,
             "client_secret": settings.auth_provider_client_secret,
-            "grant_type": "authorization_code",
-            "code": code,
+            "grant_type": "authorization_code" if not refresh_exchange else "refresh_token",
+            "code": code if not refresh_exchange else None,
             "redirect_uri": settings.auth_provider_redirect_uri,
+            "refresh_token": code if refresh_exchange else None,
         }
         url = f"{settings.auth_provider_host}/oauth2/token"
 
@@ -121,7 +126,8 @@ class Account:
                 if not kinde_token.get("access_token"):
                     raise HTTPException(status_code=400, detail="Invalid or expired authorization code")
 
-                await cls.maybe_create_user(id_token=kinde_token.get("id_token"))
+                if not refresh_exchange:
+                    await cls.maybe_create_user(id_token=kinde_token.get("id_token"))
 
                 return AccessTokenResponse(
                     access_token=kinde_token.get("access_token"),

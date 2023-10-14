@@ -54,11 +54,20 @@ async def get_login_url(payload: LoginUrlRequest, mongo_client: MongoClient = De
             return await Account.get_login_url(payload=payload)
 
 
-@router.get(
-    "/callbacks/kinde", summary="Kinde OAuth callback", tags=["Me", "OAuth"], response_model=AccessTokenResponse
-)
+@router.get("/callbacks/kinde", summary="OAuth callback", tags=["Me", "OAuth"], response_model=AccessTokenResponse)
 async def kinde_callback(code: str, state: str, mongo_client: MongoClient = Depends(MongoClientDependency())):
     async with mongo_client.transaction():
         async with Context.public():
-            access_token = await Account.exchange_code_for_token(code=code, state=state)
-            return access_token
+            return await Account.exchange_for_access_token(code=code, state=state)
+
+
+@router.get(
+    "/oauth2/token",
+    summary="Exchange refresh token for access token",
+    tags=["Me", "OAuth"],
+    response_model=AccessTokenResponse,
+)
+async def kinde_callback(refresh_token: str, mongo_client: MongoClient = Depends(MongoClientDependency())):
+    async with mongo_client.transaction():
+        async with Context.public():
+            return await Account.exchange_for_access_token(code=refresh_token, refresh_exchange=True)
