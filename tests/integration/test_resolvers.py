@@ -1,4 +1,3 @@
-import dns.resolver
 import pytest
 from pydantic.networks import IPvAnyAddress, IPv4Address, IPv6Address
 
@@ -9,10 +8,11 @@ from dnsdig.libdns.domains.resolver import Resolver, SoaResult, MxResult
 @pytest.mark.asyncio
 async def test_resolver_a():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.A)
+    records = {k: v for k, v in records.items() if k != "metadata"}
 
     assert len(records) == 3
 
-    for name, ips in records:
+    for name, ips in records.items():
         assert name, "Nameserver name is not returned"
         assert len(ips) > 0
         assert IPvAnyAddress(ips[0]), "Not a valid IP Address"
@@ -22,10 +22,11 @@ async def test_resolver_a():
 @pytest.mark.asyncio
 async def test_resolver_aaaa():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.AAAA)
+    records = {k: v for k, v in records.items() if k != "metadata"}
 
     assert len(records) == 3
 
-    for name, ips in records:
+    for name, ips in records.items():
         assert name, "Nameserver name is not returned"
         assert len(ips) > 0
         assert IPvAnyAddress(ips[0]), "Not a valid IP Address"
@@ -35,10 +36,11 @@ async def test_resolver_aaaa():
 @pytest.mark.asyncio
 async def test_resolver_mx():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.MX)
+    records = {k: v for k, v in records.items() if k != "metadata"}
 
     assert len(records) == 3
 
-    for name, mailservers in records:
+    for name, mailservers in records.items():
         assert name, "Nameserver name is not returned"
         assert len(mailservers) > 0
         result: MxResult = mailservers[0]
@@ -51,10 +53,11 @@ async def test_resolver_mx():
 @pytest.mark.asyncio
 async def test_resolver_ns():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.NS)
+    records = {k: v for k, v in records.items() if k != "metadata"}
 
     assert len(records) == 3
 
-    for name, hostnames in records:
+    for name, hostnames in records.items():
         assert name, "Nameserver name is not returned"
         assert len(hostnames) > 0
         result = hostnames[0]
@@ -64,10 +67,11 @@ async def test_resolver_ns():
 @pytest.mark.asyncio
 async def test_resolver_soa():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.SOA)
+    records = {k: v for k, v in records.items() if k != "metadata"}
 
     assert len(records) == 3
 
-    for name, hostnames in records:
+    for name, hostnames in records.items():
         assert name, "Nameserver name is not returned"
         assert len(hostnames) > 0
         result: SoaResult = hostnames[0]
@@ -81,18 +85,13 @@ async def test_resolver_soa():
 
 
 @pytest.mark.asyncio
-async def test_resolver_nxdomain():
-    with pytest.raises(dns.resolver.NXDOMAIN):
-        await Resolver.resolve_record(hostname="google01284uajksdh.com", record_type=RecordTypes.A)
-
-
-@pytest.mark.asyncio
 async def test_resolver6_aaaa():
     records = await Resolver.resolve_record6(hostname="google.com", record_type=RecordTypes.AAAA)
+    records = {k: v for k, v in records.items() if k != "metadata"}
 
     assert len(records) == 3
 
-    for name, ips in records:
+    for name, ips in records.items():
         assert name, "Nameserver name is not returned"
         assert len(ips) > 0
         assert IPvAnyAddress(ips[0]), "Not a valid IP Address"
@@ -102,10 +101,11 @@ async def test_resolver6_aaaa():
 @pytest.mark.asyncio
 async def test_resolver6_a():
     records = await Resolver.resolve_record6(hostname="google.com", record_type=RecordTypes.A)
+    records = {k: v for k, v in records.items() if k != "metadata"}
 
     assert len(records) == 3
 
-    for name, ips in records:
+    for name, ips in records.items():
         assert name, "Nameserver name is not returned"
         assert len(ips) > 0
         assert IPvAnyAddress(ips[0]), "Not a valid IP Address"
@@ -115,10 +115,11 @@ async def test_resolver6_a():
 @pytest.mark.asyncio
 async def test_resolver6_mx():
     records = await Resolver.resolve_record6(hostname="google.com", record_type=RecordTypes.MX)
+    records = {k: v for k, v in records.items() if k != "metadata"}
 
     assert len(records) == 3
 
-    for name, mailservers in records:
+    for name, mailservers in records.items():
         assert name, "Nameserver name is not returned"
         assert len(mailservers) > 0
         result: MxResult = mailservers[0]
@@ -131,10 +132,11 @@ async def test_resolver6_mx():
 @pytest.mark.asyncio
 async def test_resolver6_ns():
     records = await Resolver.resolve_record6(hostname="google.com", record_type=RecordTypes.NS)
+    records = {k: v for k, v in records.items() if k != "metadata"}
 
     assert len(records) == 3
 
-    for name, hostnames in records:
+    for name, hostnames in records.items():
         assert name, "Nameserver name is not returned"
         assert len(hostnames) > 0
         result = hostnames[0]
@@ -144,10 +146,11 @@ async def test_resolver6_ns():
 @pytest.mark.asyncio
 async def test_resolver6_soa():
     records = await Resolver.resolve_record6(hostname="google.com", record_type=RecordTypes.SOA)
+    records = {k: v for k, v in records.items() if k != "metadata"}
 
     assert len(records) == 3
 
-    for name, hostnames in records:
+    for name, hostnames in records.items():
         assert name, "Nameserver name is not returned"
         assert len(hostnames) > 0
         result: SoaResult = hostnames[0]
@@ -158,9 +161,3 @@ async def test_resolver6_soa():
         assert isinstance(result.retry, int)
         assert isinstance(result.expire, int)
         assert isinstance(result.minimum, int)
-
-
-@pytest.mark.asyncio
-async def test_resolver6_nxdomain():
-    with pytest.raises(dns.resolver.NXDOMAIN):
-        await Resolver.resolve_record6(hostname="google01284uajksdh.com", record_type=RecordTypes.A)

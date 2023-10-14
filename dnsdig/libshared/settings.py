@@ -2,7 +2,6 @@ from enum import Enum
 from functools import lru_cache
 from os import environ
 
-from pydantic import Extra
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -30,7 +29,7 @@ class Settings(BaseSettings):
     auth_provider_client_secret: str = environ.get('AUTH_PROVIDER_CLIENT_SECRET')
     auth_provider_redirect_uri: str = environ.get('AUTH_PROVIDER_REDIRECT_URI')
 
-    model_config = SettingsConfigDict(env_file=".env", extra=Extra.ignore)
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property
     def db_name(self) -> str:
