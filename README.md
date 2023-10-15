@@ -138,7 +138,7 @@ Not long ago, my work was put under a magnifying glass for due diligence. One of
 * Strong modeling, no `dict` or `list` as return types or parameters, no hardcode of values
 * Be religious with naming, bug the hell out of your team mates if they don't follow the naming convention, including the product and business folks
 
-Coming back to October 2023, documenting API endpoints at the very least in a minimum and FastAPI makes this accessible to everyone. I'm impartial of the OpenAPI spec but it is a standard and it's better than nothing.
+Coming back to October 2023, documenting API endpoints at the very least is a minimum and FastAPI makes this accessible to everyone. I'm impartial of the OpenAPI spec but it is a standard and it's better than nothing.
 
 ### Asynchrony and MongoDB
 
@@ -251,7 +251,7 @@ This is possible because FastAPI don't get in your way, it's a micro framework, 
 
 However, implementing an authorization flow is a double edged sword. It's easy to implement but it's also easy to implement it wrong. In this project, the focus is to be as minimal as possible by leveraging out of the box features.
 
-This is also the first time I wrote a protected API without having to implement user registrations or logins. It decreases the surface area of the `Account` by a considerable amount. For this project Kinde helped a lot, you spend more time on your product rather than the formalities.
+This is also the first time I wrote a protected API without having to implement user registrations or logins. It decreases the surface area of the `Account` domain by a considerable amount. For this project Kinde helped a lot, you spend more time on your product rather than the formalities.
 
 I enjoy Kinde's approach to authorization. Other auth providers implement user identities as part of [JWT Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims) while Kinde gives you an `ID Token` where the essentials of a user is defined. This `ID Token` can then be compared to your database, you can register new users without prompting them. This comes with a condition that the fields included in the `ID Token` is sufficient to create a user from, which they are in my use case. Later down the user journey, we can always ask for more details with the right context.
 
