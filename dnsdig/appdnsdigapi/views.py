@@ -1,3 +1,5 @@
+from typing import Dict
+
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -10,6 +12,31 @@ from dnsdig.libshared.context import Context
 from dnsdig.libshared.models import MongoClient, MongoClientDependency
 
 router = APIRouter()
+
+
+@router.get(
+    "/resolve/{name}",
+    summary="Resolve multiple DNS records",
+    tags=["Resolver"],
+    response_model=Dict[RecordTypes, ResolverResult],
+)
+async def resolve_dns_records(
+    name: str,
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
+    mongo_client: MongoClient = Depends(MongoClientDependency()),
+):
+    permissions = [Permissions.ReadResolver]
+
+    async with mongo_client.transaction():
+        async with Context.protected(authorization=credentials, permissions=permissions):
+            results = {
+                RecordTypes.A: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.A),
+                RecordTypes.AAAA: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.AAAA),
+                RecordTypes.MX: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.MX),
+                RecordTypes.TXT: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.TXT),
+                RecordTypes.SOA: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.SOA),
+            }
+            return results
 
 
 @router.get(
