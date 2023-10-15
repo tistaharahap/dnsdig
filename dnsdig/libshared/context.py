@@ -72,11 +72,7 @@ class Context:
         if authorization is None or authorization.credentials is None:
             raise HTTPException(status_code=401, detail="Unrecognized or missing authorization header")
 
-        instance = cls(
-            access_token=authorization.credentials,
-            permissions=permissions,
-            mongo_session=mongo_session,
-        )
+        instance = cls(access_token=authorization.credentials, permissions=permissions, mongo_session=mongo_session)
 
         await instance.authorize_access_token()
 
@@ -84,10 +80,7 @@ class Context:
 
     @classmethod
     @asynccontextmanager
-    async def public(
-        cls,
-        mongo_session: motor_asyncio.AsyncIOMotorClientSession | None = None,
-    ):
+    async def public(cls, mongo_session: motor_asyncio.AsyncIOMotorClientSession | None = None):
         instance = cls(mongo_session=mongo_session)
 
         yield instance
