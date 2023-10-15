@@ -37,15 +37,13 @@ class BaseMongoDocument(Document, BaseDatetimeMeta):
 class MongoClient:
     def __init__(self):
         self.client = mongo_client
-        self.is_testing = settings.testing == Environments.Testing.value
 
     @property
     def db_name(self) -> str:
-        db_postfix = settings.env if not self.is_testing else "test"
-        return f"dnsdig-{db_postfix}"
+        return settings.db_name
 
     @asynccontextmanager
-    async def transaction(self) -> motor_asyncio.AsyncIOMotorClient:
+    async def transaction(self) -> motor_asyncio.AsyncIOMotorClientSession:
         async with await self.client.start_session() as session:
             async with session.start_transaction():
                 try:

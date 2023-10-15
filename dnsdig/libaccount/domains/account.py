@@ -97,16 +97,17 @@ class Account:
     async def exchange_for_access_token(
         cls, code: str, state: str | None = None, refresh_exchange: bool = False
     ) -> AccessTokenResponse:
+        oauth_session = None
         if state and not refresh_exchange:
             # Exchanging authorization code for an access token
             query = {"state": state, "deleted_at": {"$eq": None}}
-            session = await monq_find_one(model=OAuthSession, query=query, project_to=OAuthSession)
-            if not session:
+            oauth_session = await monq_find_one(model=OAuthSession, query=query, project_to=OAuthSession)
+            if not oauth_session:
                 raise HTTPException(status_code=400, detail="Invalid state")
 
             # Mark session as deleted
-            session.deleted_at = datetime.utcnow()
-            await session.save()
+            oauth_session.deleted_at = datetime.utcnow()
+            await oauth_session.save()
 
         data = {
             "client_id": settings.auth_provider_client_id,
@@ -135,4 +136,5 @@ class Account:
                     expires_in=kinde_token.get("expires_in"),
                     scope=kinde_token.get("scope"),
                     token_type=kinde_token.get("token_type"),
+                    store=oauth_session.store if oauth_session else None,
                 )

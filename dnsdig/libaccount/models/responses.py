@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from pydantic import HttpUrl
 
 from dnsdig.libshared.models import BaseRequestResponse
@@ -13,3 +15,4 @@ class AccessTokenResponse(BaseRequestResponse):
     refresh_token: str
     scope: str
     token_type: str
+    store: Dict[str, Any] | None = None
