@@ -7,9 +7,6 @@ on:
       - tests/**
       - .github/workflows/dnsdig-api.yaml
 
-env:
-  PYTEST_INI: pytest-ci.ini
-
 jobs:
   build:
     name: Test DNS Dig API
