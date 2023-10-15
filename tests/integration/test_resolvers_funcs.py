@@ -3,6 +3,7 @@ from pydantic.networks import IPvAnyAddress, IPv4Address, IPv6Address
 
 from dnsdig.libdns.constants import RecordTypes
 from dnsdig.libdns.domains.resolver import Resolver, SoaResult, MxResult
+from dnsdig.libshared.utils import random_chars
 
 
 @pytest.mark.asyncio
@@ -85,6 +86,18 @@ async def test_resolver_soa():
 
 
 @pytest.mark.asyncio
+async def test_resolver_txt():
+    records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.TXT)
+    records = {k: v for k, v in records.items() if k != "metadata"}
+
+    assert len(records) == 3
+
+    for name, items in records.items():
+        assert name, "Nameserver name is not returned"
+        assert len(items) > 0
+
+
+@pytest.mark.asyncio
 async def test_resolver6_aaaa():
     records = await Resolver.resolve_record6(hostname="google.com", record_type=RecordTypes.AAAA)
     records = {k: v for k, v in records.items() if k != "metadata"}
@@ -161,3 +174,40 @@ async def test_resolver6_soa():
         assert isinstance(result.retry, int)
         assert isinstance(result.expire, int)
         assert isinstance(result.minimum, int)
+
+
+@pytest.mark.asyncio
+async def test_resolver6_txt():
+    records = await Resolver.resolve_record6(hostname="google.com", record_type=RecordTypes.TXT)
+    records = {k: v for k, v in records.items() if k != "metadata"}
+
+    assert len(records) == 3
+
+    for name, items in records.items():
+        assert name, "Nameserver name is not returned"
+        assert len(items) > 0
+
+
+@pytest.mark.asyncio
+async def test_resolver_nxdomain():
+    domain = f"{random_chars(23)}-{random_chars(7)}.com"
+    records = await Resolver.resolve_record(hostname=domain, record_type=RecordTypes.A)
+
+    metadata = records.get("metadata")
+
+    assert len(records) == 4
+    assert 'cloudflare: NXDOMAIN' in metadata
+    assert 'google: NXDOMAIN' in metadata
+    assert 'opendns: NXDOMAIN' in metadata
+
+
+@pytest.mark.asyncio
+async def test_resolver_noanswer():
+    records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.PTR)
+
+    metadata = records.get("metadata")
+
+    assert len(records) == 4
+    assert 'cloudflare: NoAnswer' in metadata
+    assert 'google: NoAnswer' in metadata
+    assert 'opendns: NoAnswer' in metadata

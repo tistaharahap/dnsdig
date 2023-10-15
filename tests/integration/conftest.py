@@ -6,6 +6,7 @@ import pytest
 import pytest_asyncio
 from beanie import init_beanie
 from faker import Faker
+from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from fastapi.testclient import TestClient
 from motor import motor_asyncio
@@ -31,7 +32,7 @@ async def beanie():
     await init_beanie(database=mongo_client[settings.db_name], document_models=[User, OAuthSession])
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="function")
 async def user() -> User:
     return await Account.create_user(
         email=f"{random_chars(23)}@{random_chars(10)}.com",
@@ -66,11 +67,15 @@ class FakeContext:
         mongo_session: motor_asyncio.AsyncIOMotorClientSession | None = None,
         **kwargs,
     ):
+        current_user = kwargs.get("current_user")
+        if current_user.is_blocked:
+            raise HTTPException(status_code=403)
+
         yield cls(
             access_token=authorization.credentials,
             permissions=permissions,
             mongo_session=mongo_session,
-            current_user=kwargs.get("current_user"),
+            current_user=current_user,
         )
 
     @classmethod
