@@ -5,7 +5,7 @@ on:
     paths:
       - dnsdig/**
       - tests/**
-      - .github/dnsdig-api.yaml
+      - .github/workflows/dnsdig-api.yaml
 
 env:
   PYTEST_INI: pytest-ci.ini
