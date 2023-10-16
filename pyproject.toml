@@ -21,6 +21,8 @@ ujson = "^5.8.0"
 cryptography = "^41.0.4"
 email-validator = "^2.0.0.post2"
 pymongo = "^4.5.0"
+aiocsv = "^1.2.4"
+aiofiles = "^23.2.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.2"
@@ -30,6 +32,8 @@ faker = "^19.10.0"
 pytest-env = "^1.0.1"
 httpx = "^0.25.0"
 pytest-cov = "^4.1.0"
+typer = "^0.9.0"
+rich = "^13.6.0"
 
 [build-system]
 requires = ["poetry-core"]

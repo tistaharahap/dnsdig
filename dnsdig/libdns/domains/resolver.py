@@ -4,8 +4,10 @@ import dns.asyncresolver
 
 from dnsdig.libdns.constants import RecordTypes
 from dnsdig.libdns.models.resolver import ResolverSet, MxResult, SoaResult
+from dnsdig.libgeoip.domains.ip2geolocation import IP2Geo
+from dnsdig.libgeoip.models import IPLocationResult
 
-ResolverResult = Dict[str, List[str | MxResult | SoaResult]]
+ResolverResult = Dict[str, List[str | IPLocationResult | MxResult | SoaResult]]
 
 
 class Resolver:
@@ -33,6 +35,10 @@ class Resolver:
     @classmethod
     def _parse_txt_result(cls, result: str) -> str:
         return result.replace('"', "")
+
+    @classmethod
+    async def _parse_a_result(cls, result: str) -> IPLocationResult:
+        return await IP2Geo.ip_to_location(ip=result)
 
     @classmethod
     async def resolve_record(cls, hostname: str, record_type: RecordTypes, use_ipv6: bool = False) -> ResolverResult:
@@ -65,6 +71,8 @@ class Resolver:
                         _rec = cls._parse_soa_result(_rec)
                     case RecordTypes.TXT:
                         _rec = cls._parse_txt_result(_rec)
+                    case RecordTypes.A:
+                        _rec = await cls._parse_a_result(_rec)
 
                 records.append(_rec)
             results.update({name: records})
