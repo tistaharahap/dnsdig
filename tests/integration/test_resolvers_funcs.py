@@ -16,8 +16,8 @@ async def test_resolver_a():
     for name, ips in records.items():
         assert name, "Nameserver name is not returned"
         assert len(ips) > 0
-        assert IPvAnyAddress(ips[0]), "Not a valid IP Address"
-        assert IPv4Address(ips[0]), "Not a valid IPv4 Address"
+        assert IPvAnyAddress(ips[0].ip), "Not a valid IP Address"
+        assert IPv4Address(ips[0].ip), "Not a valid IPv4 Address"
 
 
 @pytest.mark.asyncio

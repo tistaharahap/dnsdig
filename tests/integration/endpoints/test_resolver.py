@@ -13,6 +13,9 @@ def test_resolver_a(client: TestClient):
         opendns = resp_body.get("opendns")
 
         assert response.status_code == 200
+        assert google[0].get("ip")
+        assert cloudflare[0].get("ip")
+        assert opendns[0].get("ip")
         assert len(metadata) == 0
         assert len(google) > 0
         assert len(cloudflare) > 0
