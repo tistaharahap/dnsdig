@@ -54,6 +54,55 @@ In the response, you will find a `loginUrl` key, copy and paste the value to you
 
 You can then use the access token to authorize yourself in the API docs. Click the `Authorize` button on the top right corner of the API docs and enter `<access_token>` in the `Value` field and click the `Authorize` button.
 
+### Running With Docker
+
+You can also run the API with Docker. Make sure you have Docker installed and then run the commands below.
+
+```bash
+$ docker build -t docker_username/docker_repo: latest .
+$ docker run -d --name dnsdig -p 8080:8080 \
+  -e WEB_CONCURRENCY=$WEB_CONCURRENCY \
+  -e ENV=$ENV \
+  -e MONGO_URL=$MONGO_URL \
+  -e AUTH_JWKS_URL=$AUTH_JWKS_URL \
+  -e AUTH_JWT_ALGO=$AUTH_JWT_ALGO \
+  -e AUTH_PROVIDER_HOST=$AUTH_PROVIDER_HOST \
+  -e AUTH_PROVIDER_CLIENT_ID=$AUTH_PROVIDER_CLIENT_ID \
+  -e AUTH_PROVIDER_CLIENT_SECRET=$AUTH_PROVIDER_CLIENT_SECRET \
+  -e AUTH_PROVIDER_REDIRECT_URI=$AUTH_PROVIDER_REDIRECT_URI \
+  docker_username/docker_repo:latest
+````
+
+Or if you want to get a prebuilt image, you can do the below.
+
+```bash
+$ docker run -d --name dnsdig -p 8080:8080 \
+  -e WEB_CONCURRENCY=$WEB_CONCURRENCY \
+  -e ENV=$ENV \
+  -e MONGO_URL=$MONGO_URL \
+  -e AUTH_JWKS_URL=$AUTH_JWKS_URL \
+  -e AUTH_JWT_ALGO=$AUTH_JWT_ALGO \
+  -e AUTH_PROVIDER_HOST=$AUTH_PROVIDER_HOST \
+  -e AUTH_PROVIDER_CLIENT_ID=$AUTH_PROVIDER_CLIENT_ID \
+  -e AUTH_PROVIDER_CLIENT_SECRET=$AUTH_PROVIDER_CLIENT_SECRET \
+  -e AUTH_PROVIDER_REDIRECT_URI=$AUTH_PROVIDER_REDIRECT_URI \
+  tistaharahap/dnsdig:latest
+```
+
+### Environment Variables
+
+| Name                          | Description                             |
+|:------------------------------|:----------------------------------------|
+| `WEB_CONCURRENCY`             | Optional string, defaults to 1 on macOS |
+| `ENV`                         | Required string                         |
+| `MONGO_URL`                   | Required string                         |
+| `AUTH_JWKS_URL`               | Required string                         |
+| `AUTH_JWT_ALGO`               | Required string                         |
+| `AUTH_PROVIDER_HOST`          | Required string                         |
+| `AUTH_PROVIDER_CLIENT_ID`     | Required string                         |
+| `AUTH_PROVIDER_CLIENT_SECRET` | Required string                         |
+| `AUTH_PROVIDER_REDIRECT_URI`  | Required string                         |
+
 ### Bonus
 
 Resolved IP addresses can be geolocated by using the IP database [here](https://github.com/sapics/ip-location-db).
