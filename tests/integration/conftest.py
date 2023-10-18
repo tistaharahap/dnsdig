@@ -55,8 +55,10 @@ class FakeContext:
         self.access_token = access_token
         self.permissions = permissions
         self.mongo_session = mongo_session
-        self.current_user = current_user
-        self.auth_provider_user_id = current_user.auth_provider_user_id
+
+        if current_user:
+            self.current_user = current_user
+            self.auth_provider_user_id = current_user.auth_provider_user_id
 
     @classmethod
     @asynccontextmanager
