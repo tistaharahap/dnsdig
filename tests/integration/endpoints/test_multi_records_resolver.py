@@ -1,8 +1,16 @@
+from unittest import mock
+from unittest.mock import AsyncMock
+
 from fastapi.testclient import TestClient
 
 from dnsdig.libdns.constants import RecordTypes
+from dnsdig.libgeoip.models import IPLocationResult
+
+patched_ip2location = AsyncMock()
+patched_ip2location.return_value = IPLocationResult(ip="127.0.0.1")
 
 
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 def test_multi_records_resolver(client: TestClient):
     with client:
         headers = {"authorization": "Bearer 123"}

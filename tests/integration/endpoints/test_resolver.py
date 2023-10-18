@@ -1,6 +1,15 @@
+from unittest import mock
+from unittest.mock import AsyncMock
+
 from fastapi.testclient import TestClient
 
+from dnsdig.libgeoip.models import IPLocationResult
 
+patched_ip2location = AsyncMock()
+patched_ip2location.return_value = IPLocationResult(ip="127.0.0.1")
+
+
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 def test_resolver_a(client: TestClient):
     with client:
         headers = {"authorization": "Bearer 123"}
@@ -22,6 +31,7 @@ def test_resolver_a(client: TestClient):
         assert len(opendns) > 0
 
 
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 def test_resolver_aaaa(client: TestClient):
     with client:
         headers = {"authorization": "Bearer 123"}
@@ -40,6 +50,7 @@ def test_resolver_aaaa(client: TestClient):
         assert len(opendns) > 0
 
 
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 def test_resolver_mx(client: TestClient):
     with client:
         headers = {"authorization": "Bearer 123"}
@@ -58,6 +69,7 @@ def test_resolver_mx(client: TestClient):
         assert len(opendns) > 0
 
 
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 def test_resolver_soa(client: TestClient):
     with client:
         headers = {"authorization": "Bearer 123"}
@@ -76,6 +88,7 @@ def test_resolver_soa(client: TestClient):
         assert len(opendns) > 0
 
 
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 def test_resolver_txt(client: TestClient):
     with client:
         headers = {"authorization": "Bearer 123"}

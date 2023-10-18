@@ -1,11 +1,19 @@
+from unittest import mock
+from unittest.mock import AsyncMock
+
 import pytest
 from pydantic.networks import IPvAnyAddress, IPv4Address, IPv6Address
 
 from dnsdig.libdns.constants import RecordTypes
 from dnsdig.libdns.domains.resolver import Resolver, SoaResult, MxResult
+from dnsdig.libgeoip.models import IPLocationResult
 from dnsdig.libshared.utils import random_chars
 
+patched_ip2location = AsyncMock()
+patched_ip2location.return_value = IPLocationResult(ip="127.0.0.1")
 
+
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 @pytest.mark.asyncio
 async def test_resolver_a():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.A)
@@ -20,6 +28,7 @@ async def test_resolver_a():
         assert IPv4Address(ips[0].ip), "Not a valid IPv4 Address"
 
 
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 @pytest.mark.asyncio
 async def test_resolver_aaaa():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.AAAA)
@@ -34,6 +43,7 @@ async def test_resolver_aaaa():
         assert IPv6Address(ips[0]), "Not a valid IPv6 Address"
 
 
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 @pytest.mark.asyncio
 async def test_resolver_mx():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.MX)
@@ -51,6 +61,7 @@ async def test_resolver_mx():
         assert isinstance(result.hostname, str), "Hostname must be a string"
 
 
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 @pytest.mark.asyncio
 async def test_resolver_ns():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.NS)
@@ -65,6 +76,7 @@ async def test_resolver_ns():
         assert isinstance(result, str)
 
 
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 @pytest.mark.asyncio
 async def test_resolver_soa():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.SOA)
@@ -85,6 +97,7 @@ async def test_resolver_soa():
         assert isinstance(result.minimum, int)
 
 
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 @pytest.mark.asyncio
 async def test_resolver_txt():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.TXT)
