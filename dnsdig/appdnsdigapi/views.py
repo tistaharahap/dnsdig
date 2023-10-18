@@ -2,6 +2,7 @@ from typing import Dict
 
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi_limiter.depends import RateLimiter
 
 from dnsdig.libaccount.domains.account import Account
 from dnsdig.libaccount.models.auth import LoginUrlRequest, Permissions
@@ -10,6 +11,7 @@ from dnsdig.libdns.constants import RecordTypes
 from dnsdig.libdns.domains.resolver import ResolverResult, Resolver
 from dnsdig.libshared.context import Context
 from dnsdig.libshared.models import MongoClient, MongoClientDependency
+from dnsdig.libshared.settings import settings
 
 router = APIRouter()
 
@@ -40,6 +42,26 @@ async def resolve_dns_records(
 
 
 @router.get(
+    "/freesolve/{name}",
+    summary="Resolve multiple DNS records - Throttled",
+    tags=["Resolver", "Throttled"],
+    response_model=Dict[RecordTypes, ResolverResult],
+    dependencies=[Depends(RateLimiter(times=settings.throttler_times, seconds=settings.throttler_seconds))],
+)
+async def freesolve_dns_records(name: str, mongo_client: MongoClient = Depends(MongoClientDependency())):
+    async with mongo_client.transaction():
+        async with Context.public():
+            results = {
+                RecordTypes.A: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.A),
+                RecordTypes.AAAA: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.AAAA),
+                RecordTypes.MX: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.MX),
+                RecordTypes.TXT: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.TXT),
+                RecordTypes.SOA: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.SOA),
+            }
+            return results
+
+
+@router.get(
     "/resolve/{name}/{record_type}", summary="Resolve a DNS record", tags=["Resolver"], response_model=ResolverResult
 )
 async def resolve_dns_record(
@@ -52,6 +74,21 @@ async def resolve_dns_record(
 
     async with mongo_client.transaction():
         async with Context.protected(authorization=credentials, permissions=permissions):
+            return await Resolver.resolve_record(hostname=name, record_type=record_type)
+
+
+@router.get(
+    "/freesolve/{name}/{record_type}",
+    summary="Resolve a DNS record",
+    tags=["Resolver", "Throttled"],
+    response_model=ResolverResult,
+    dependencies=[Depends(RateLimiter(times=settings.throttler_times, seconds=settings.throttler_seconds))],
+)
+async def freesolve_dns_record(
+    name: str, record_type: RecordTypes = RecordTypes.A, mongo_client: MongoClient = Depends(MongoClientDependency())
+):
+    async with mongo_client.transaction():
+        async with Context.public():
             return await Resolver.resolve_record(hostname=name, record_type=record_type)
 
 

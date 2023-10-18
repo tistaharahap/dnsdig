@@ -1,6 +1,8 @@
+import redis.asyncio as redis
 from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi_limiter import FastAPILimiter
 
 from dnsdig.appdnsdigapi.views import router as dnsdig_router
 from dnsdig.libaccount.models.mongo import User, OAuthSession
@@ -9,13 +11,18 @@ from dnsdig.libshared.models import mongo_client
 from dnsdig.libshared.settings import settings, Environments
 
 
-async def startup_event():
+async def beanie_setup():
     if settings.env == Environments.Dev:
         logger.info(f"Mongo URL: {settings.mongo_url}")
     logger.info("Initializing MongoDB - Start")
     collections = [User, OAuthSession]
     await init_beanie(database=mongo_client[settings.db_name], document_models=collections)
     logger.info("Initializing MongoDB - End")
+
+
+async def limiter_setup():
+    redis_client = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
+    await FastAPILimiter.init(redis_client)
 
 
 app_params = {
@@ -25,7 +32,7 @@ app_params = {
     'docs_url': None,
     'redoc_url': None,
 }
-app = FastAPI(**app_params, on_startup=[startup_event])
+app = FastAPI(**app_params, on_startup=[beanie_setup, limiter_setup])
 
 
 @app.get("/healthcheck", status_code=200, tags=['System'])
