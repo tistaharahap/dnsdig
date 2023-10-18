@@ -29,6 +29,8 @@ class IP2Geo:
             url = f"{settings.ipinfo_host}/{ip}/json"
             headers = {"Accept": "application/json", "Authorization": f"Bearer {settings.ipinfo_token}"}
             async with session.get(url, headers=headers) as response:
+                if response.status != 200:
+                    return IPLocationResult(ip=ip)
                 location = IPInfoResponse.model_validate_json(await response.text())
                 if not location:
                     return IPLocationResult(ip=ip)
