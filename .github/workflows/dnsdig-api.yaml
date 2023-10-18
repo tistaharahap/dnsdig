@@ -21,6 +21,7 @@ jobs:
       matrix:
         python-version: ['3.11']
         mongodb-version: ['6.0']
+        redis-version: ['7.2']
     timeout-minutes: 20
     steps:
       - name: Checkout repository
@@ -41,6 +42,10 @@ jobs:
           mongodb-username: supercharge
           mongodb-password: secret
           mongodb-db: supercharge
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.7.0
+        with:
+          redis-version: ${{ matrix.redis-version }}
       - name: Install Dependencies
         run: |
           python3 -m pip install poetry==1.3.2
