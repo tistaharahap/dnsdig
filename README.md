@@ -73,6 +73,8 @@ $ docker run -d --name dnsdig -p 8080:8080 \
   -e REDIS_URL=$REDIS_URL \
   -e THROTTLER_TIMES=$THROTTLER_TIMES \
   -e THROTTLER_SECONDS=$THROTTLER_SECONDS \
+  -e IPINFO_HOST=$IPINFO_HOST \
+  -e IPINFO_TOKEN=$IPINFO_TOKEN \
   docker_username/docker_repo:latest
 ````
 
@@ -92,6 +94,8 @@ $ docker run -d --name dnsdig -p 8080:8080 \
   -e REDIS_URL=$REDIS_URL \
   -e THROTTLER_TIMES=$THROTTLER_TIMES \
   -e THROTTLER_SECONDS=$THROTTLER_SECONDS \
+  -e IPINFO_HOST=$IPINFO_HOST \
+  -e IPINFO_TOKEN=$IPINFO_TOKEN \
   tistaharahap/dnsdig:latest
 ```
 
@@ -111,25 +115,8 @@ $ docker run -d --name dnsdig -p 8080:8080 \
 | `REDIS_URL`                   | Required string                         |
 | `THROTTLER_TIMES`             | Required string                         |
 | `THROTTLER_SECONDS`           | Required string                         |
-
-### Bonus
-
-Resolved IP addresses can be geolocated by using the IP database [here](https://github.com/sapics/ip-location-db).
-
-The specific database is below:
-
-[https://github.com/sapics/ip-location-db/raw/master/dbip-city/dbip-city-ipv4.csv.gz](https://github.com/sapics/ip-location-db/raw/master/dbip-city/dbip-city-ipv4.csv.gz)
-
-### Importing IP Database
-
-Download the IP database, extract it and run the commands below.
-
-```
-$ python dnsdig/appclis/dbip-importer.py \
-  --mongodb-url=<your_mongo_url> \
-  --db-name=dnsdig-<your_env> \
-  --dbip-city-csv=<path_to_dbip_city_csv>
-```
+| `IPINFO_HOST`                 | Required string                         |
+| `IPINFO_TOKEN`                | Required string                         |
 
 ## Why Build This?
 

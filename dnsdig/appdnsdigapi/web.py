@@ -13,7 +13,7 @@ from dnsdig.libshared.settings import settings, Environments
 
 async def beanie_setup():
     if settings.env == Environments.Dev:
-        logger.info(f"Mongo URL: {settings.mongo_url}")
+        logger.info(f"Mongo URL: {settings.mongo_url} - {settings.db_name}")
     logger.info("Initializing MongoDB - Start")
     collections = [User, OAuthSession]
     await init_beanie(database=mongo_client[settings.db_name], document_models=collections)

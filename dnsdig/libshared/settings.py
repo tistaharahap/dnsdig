@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     auth_provider_client_id: str
     auth_provider_client_secret: str
     auth_provider_redirect_uri: str
+    ipinfo_host: str
+    ipinfo_token: str
 
     # Throttler
     throttler_times: int = 30
