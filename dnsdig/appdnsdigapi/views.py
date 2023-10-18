@@ -60,12 +60,20 @@ async def resolve_dns_records(
 async def freesolve_dns_records(name: str, mongo_client: MongoClient = Depends(MongoClientDependency())):
     async with mongo_client.transaction():
         async with Context.public():
+            group = [
+                Resolver.resolve_record(hostname=name, record_type=RecordTypes.A),
+                Resolver.resolve_record(hostname=name, record_type=RecordTypes.AAAA),
+                Resolver.resolve_record(hostname=name, record_type=RecordTypes.MX),
+                Resolver.resolve_record(hostname=name, record_type=RecordTypes.TXT),
+                Resolver.resolve_record(hostname=name, record_type=RecordTypes.SOA),
+            ]
+            group_results = await asyncio.gather(*group)
             results = {
-                RecordTypes.A: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.A),
-                RecordTypes.AAAA: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.AAAA),
-                RecordTypes.MX: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.MX),
-                RecordTypes.TXT: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.TXT),
-                RecordTypes.SOA: await Resolver.resolve_record(hostname=name, record_type=RecordTypes.SOA),
+                RecordTypes.A: group_results[0],
+                RecordTypes.AAAA: group_results[1],
+                RecordTypes.MX: group_results[2],
+                RecordTypes.TXT: group_results[3],
+                RecordTypes.SOA: group_results[4],
             }
             return results
 
