@@ -102,6 +102,9 @@ $ docker run -d --name dnsdig -p 8080:8080 \
 | `AUTH_PROVIDER_CLIENT_ID`     | Required string                         |
 | `AUTH_PROVIDER_CLIENT_SECRET` | Required string                         |
 | `AUTH_PROVIDER_REDIRECT_URI`  | Required string                         |
+| `REDIS_URL`                   | Required string                         |
+| `THROTTLER_TIMES`             | Required string                         |
+| `THROTTLER_SECONDS`           | Required string                         |
 
 ### Bonus
 
