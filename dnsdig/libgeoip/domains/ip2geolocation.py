@@ -1,5 +1,3 @@
-import ipaddress
-
 import aiohttp
 from cache import AsyncLRU
 
@@ -8,20 +6,6 @@ from dnsdig.libshared.settings import settings
 
 
 class IP2Geo:
-    @classmethod
-    def ip_to_integer(cls, ip: str) -> int | None:
-        try:
-            return int(ipaddress.ip_address(ip))
-        except ValueError:
-            return None
-
-    @classmethod
-    def integer_to_ip(cls, integer: int) -> str | None:
-        try:
-            return str(ipaddress.ip_address(integer))
-        except ValueError:
-            return None
-
     @classmethod
     @AsyncLRU(maxsize=8192)
     async def ip_to_location(cls, ip: str, ttl: int) -> IPLocationResult:

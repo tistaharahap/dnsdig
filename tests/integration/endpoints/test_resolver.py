@@ -31,6 +31,26 @@ def test_resolver_a(client: TestClient):
         assert len(opendns) > 0
 
 
+def test_freesolver_a(client: TestClient):
+    with client:
+        response = client.get("/v1/freesolve/google.com/A")
+        resp_body = response.json()
+
+        metadata = resp_body.get("metadata")
+        google = resp_body.get("google")
+        cloudflare = resp_body.get("cloudflare")
+        opendns = resp_body.get("opendns")
+
+        assert response.status_code == 200
+        assert google[0].get("ip")
+        assert cloudflare[0].get("ip")
+        assert opendns[0].get("ip")
+        assert len(metadata) == 0
+        assert len(google) > 0
+        assert len(cloudflare) > 0
+        assert len(opendns) > 0
+
+
 @mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
 def test_resolver_aaaa(client: TestClient):
     with client:

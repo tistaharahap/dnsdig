@@ -1,0 +1,4 @@
+[run]
+omit =
+  dnsdig/appclis/*
+  dnsdig/libshared/monq.py
