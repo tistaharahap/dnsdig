@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from dnsdig.libgeoip.models import IPLocationResult
 
 patched_ip2location = AsyncMock()
-patched_ip2location.return_value = IPLocationResult(ip="127.0.0.1")
+patched_ip2location.return_value = IPLocationResult(ip="127.0.0.1", ttl=300)
 
 
 @mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)

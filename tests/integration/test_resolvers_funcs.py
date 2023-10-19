@@ -6,11 +6,14 @@ from pydantic.networks import IPvAnyAddress, IPv4Address, IPv6Address
 
 from dnsdig.libdns.constants import RecordTypes
 from dnsdig.libdns.domains.resolver import Resolver, SoaResult, MxResult
+from dnsdig.libdns.models.resolver import NSResult
 from dnsdig.libgeoip.models import IPLocationResult
 from dnsdig.libshared.utils import random_chars
 
 patched_ip2location = AsyncMock()
-patched_ip2location.return_value = IPLocationResult(ip="127.0.0.1")
+patched_ip2location.return_value = IPLocationResult(ip="127.0.0.1", ttl=300)
+patched6_ip2location = AsyncMock()
+patched6_ip2location.return_value = IPLocationResult(ip="::1", ttl=300)
 
 
 @mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
@@ -28,7 +31,7 @@ async def test_resolver_a():
         assert IPv4Address(ips[0].ip), "Not a valid IPv4 Address"
 
 
-@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
+@mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched6_ip2location)
 @pytest.mark.asyncio
 async def test_resolver_aaaa():
     records = await Resolver.resolve_record(hostname="google.com", record_type=RecordTypes.AAAA)
@@ -39,8 +42,8 @@ async def test_resolver_aaaa():
     for name, ips in records.items():
         assert name, "Nameserver name is not returned"
         assert len(ips) > 0
-        assert IPvAnyAddress(ips[0]), "Not a valid IP Address"
-        assert IPv6Address(ips[0]), "Not a valid IPv6 Address"
+        assert IPvAnyAddress(ips[0].ip), "Not a valid IP Address"
+        assert IPv6Address(ips[0].ip), "Not a valid IPv6 Address"
 
 
 @mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
@@ -73,7 +76,7 @@ async def test_resolver_ns():
         assert name, "Nameserver name is not returned"
         assert len(hostnames) > 0
         result = hostnames[0]
-        assert isinstance(result, str)
+        assert isinstance(result, NSResult)
 
 
 @mock.patch("dnsdig.libgeoip.domains.ip2geolocation.IP2Geo.ip_to_location", patched_ip2location)
