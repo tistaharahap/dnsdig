@@ -27,10 +27,11 @@ if test "x${WEB_CONCURRENCY}" = 'x'; then
   if [ "$machine" == "Mac" ]; then
     export WEB_CONCURRENCY=1
   else
-    export WEB_CONCURRENCY=`nproc --all`
+    num_of_cores=$(nproc --all)
+    export WEB_CONCURRENCY=$num_of_cores
   fi
 fi
-echo 'WEB_CONCURRENCY is: '${WEB_CONCURRENCY}
+echo 'WEB_CONCURRENCY is: '"${WEB_CONCURRENCY}"
 
 if test "x${ENV}" = 'xdev'; then
   uvicorn dnsdig.appdnsdigapi.web:app --host $HOST --port $PORT --workers "$WEB_CONCURRENCY" --log-level info --reload
