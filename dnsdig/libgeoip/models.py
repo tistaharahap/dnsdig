@@ -42,6 +42,7 @@ class IPLocationResult(BaseRequestResponse):
     province: str | None = None
     city: str | None = None
     geo: GeoObject | None = None
+    ttl: int
 
 
 class IPInfoResponse(BaseRequestResponse):

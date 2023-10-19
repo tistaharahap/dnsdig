@@ -40,6 +40,7 @@ class ResolverSet(BaseModel):
 class MxResult(BaseRequestResponse):
     priority: int
     hostname: str
+    ttl: int
 
 
 class SoaResult(BaseRequestResponse):
@@ -50,3 +51,14 @@ class SoaResult(BaseRequestResponse):
     retry: int
     expire: int
     minimum: int
+    ttl: int
+
+
+class NSResult(BaseRequestResponse):
+    hostname: str
+    ttl: int
+
+
+class TXTResult(BaseRequestResponse):
+    txt: str
+    ttl: int
