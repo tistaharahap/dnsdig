@@ -8,7 +8,6 @@ from dnsdig.libdns.constants import RecordTypes
 from dnsdig.libdns.domains.resolver import Resolver, SoaResult, MxResult
 from dnsdig.libdns.models.resolver import NSResult
 from dnsdig.libgeoip.models import IPLocationResult
-from dnsdig.libshared.utils import random_chars
 
 patched_ip2location = AsyncMock()
 patched_ip2location.return_value = IPLocationResult(ip="127.0.0.1", ttl=300)

@@ -1,9 +1,10 @@
+import asyncio
 from typing import List, Dict
 
 import dns.asyncresolver
 
 from dnsdig.libdns.constants import RecordTypes
-from dnsdig.libdns.models.resolver import ResolverSet, MxResult, SoaResult, NSResult, TXTResult
+from dnsdig.libdns.models.resolver import ResolverSet, MxResult, SoaResult, NSResult, TXTResult, DNSResolver
 from dnsdig.libgeoip.domains.ip2geolocation import IP2Geo
 from dnsdig.libgeoip.models import IPLocationResult
 from dnsdig.libshared.logging import logger
@@ -48,29 +49,37 @@ class Resolver:
         return await IP2Geo.ip_to_location(ip=result, ttl=ttl)
 
     @classmethod
-    async def resolve_record(cls, hostname: str, record_type: RecordTypes, use_ipv6: bool = False) -> ResolverResult:
-        logger.info(f"Resolving {hostname} {record_type}")
+    async def resolve_record(
+        cls, hostname: str, record_type: RecordTypes, use_ipv6: bool = False, nameserver: str | None = None
+    ) -> ResolverResult:
+        func = dns.asyncresolver.resolve_at
         results = {'metadata': []}
-        for name, resolver in cls.resolvers.all:
-            try:
-                answer = await dns.asyncresolver.resolve_at(
-                    where=resolver.random if not use_ipv6 else resolver.random6, qname=hostname, rdtype=record_type
-                )
-            except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer) as exc:
-                results.update({name: []})
-                metadata = results.get("metadata", [])
-                if isinstance(exc, dns.resolver.NXDOMAIN):
-                    metadata.append(f"{name}: NXDOMAIN")
-                elif isinstance(exc, dns.resolver.NoAnswer):
-                    metadata.append(f"{name}: NoAnswer")
-                results.update({"metadata": metadata})
-                continue
+
+        def _nameserver(resolver: DNSResolver) -> str:
+            if nameserver:
+                return nameserver
+            return resolver.random if not use_ipv6 else resolver.random6
+
+        async def _result(name: str, where: str, qname: str, rdtype: RecordTypes):
+            result = await func(where=where, qname=qname, rdtype=rdtype)
+            return {name: result}
+
+        grouped = [
+            _result(name=name, where=_nameserver(resolver), qname=hostname, rdtype=record_type)
+            for name, resolver in cls.resolvers.all
+        ]
+        resolved = await asyncio.gather(*grouped)
+
+        async def _parse_result(
+            _res: Dict[str, dns.resolver.Answer]
+        ) -> Dict[str, List[str | IPLocationResult | MxResult | SoaResult | NSResult | TXTResult]]:
+            name, answer = [x for x in _res.items()][0]
 
             records = []
             ttl = answer.chaining_result.minimum_ttl
+
             for record in answer:
                 _rec = str(record)
-
                 match record_type:
                     case RecordTypes.MX:
                         _rec = cls._parse_mx_result(_rec, ttl=ttl)
@@ -84,9 +93,10 @@ class Resolver:
                         _rec = await cls._parse_a_result(_rec, ttl=ttl)
                     case RecordTypes.AAAA:
                         _rec = await cls._parse_a_result(_rec, ttl=ttl)
-
                 records.append(_rec)
-            results.update({name: records})
+            return {name: records}
+
+        [results.update(await _parse_result(x)) for x in resolved]
 
         return results
 
