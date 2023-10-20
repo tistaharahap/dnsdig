@@ -7,7 +7,6 @@ from dnsdig.libdns.constants import RecordTypes
 from dnsdig.libdns.models.resolver import ResolverSet, MxResult, SoaResult, NSResult, TXTResult, DNSResolver
 from dnsdig.libgeoip.domains.ip2geolocation import IP2Geo
 from dnsdig.libgeoip.models import IPLocationResult
-from dnsdig.libshared.logging import logger
 
 ResolverResult = Dict[str, List[str | IPLocationResult | MxResult | SoaResult | NSResult | TXTResult]]
 
