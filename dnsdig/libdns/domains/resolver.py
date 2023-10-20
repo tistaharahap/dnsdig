@@ -63,11 +63,15 @@ class Resolver:
             result = await func(where=where, qname=qname, rdtype=rdtype)
             return {name: result}
 
-        grouped = [
-            _result(name=name, where=_nameserver(resolver), qname=hostname, rdtype=record_type)
-            for name, resolver in cls.resolvers.all
-        ]
-        resolved = await asyncio.gather(*grouped)
+        try:
+            grouped = [
+                _result(name=name, where=_nameserver(resolver), qname=hostname, rdtype=record_type)
+                for name, resolver in cls.resolvers.all
+            ]
+            resolved = await asyncio.gather(*grouped)
+        except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.resolver.NoNameservers) as exc:
+            results.update({"metadata": [f"{hostname} - {exc}"]})
+            return results
 
         async def _parse_result(
             _res: Dict[str, dns.resolver.Answer]
