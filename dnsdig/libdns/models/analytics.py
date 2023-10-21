@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from enum import Enum
+from typing import List
 
 from dns.rdatatype import RdataType
 
@@ -24,6 +25,7 @@ class AnalyticsResults(BaseRequestResponse):
     median: float
     minimum: float
     maximum: float
+    percentiles: List[float]
 
 
 class Analytics(BaseMongoDocument):
@@ -46,6 +48,9 @@ class Analytics(BaseMongoDocument):
                     "median": {"$median": {"input": "$resolve_time", "method": "approximate"}},
                     "minimum": {"$min": "$resolve_time"},
                     "maximum": {"$max": "$resolve_time"},
+                    "percentiles": {
+                        "$percentile": {"input": "$resolve_time", "p": [0.75, 0.99], "method": "approximate"}
+                    },
                 }
             },
             {"$project": {"_id": False}},

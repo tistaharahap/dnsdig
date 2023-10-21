@@ -68,12 +68,19 @@ class DNSDigUDPServer:
             "Median",
             "Minimum",
             "Maximum",
+            "75%",
+            "99%",
             title="Per Minute Stats",
             title_justify="center",
             caption=f"Last {timeframe.value} minutes",
         )
         table.add_row(
-            f"{stats.average:.2f} ms", f"{stats.median:.2f} ms", f"{stats.minimum:.2f} ms", f"{stats.maximum:.2f} ms"
+            f"{stats.average:.2f} ms",
+            f"{stats.median:.2f} ms",
+            f"{stats.minimum:.2f} ms",
+            f"{stats.maximum:.2f} ms",
+            f"{stats.percentiles[0]:.2f} ms",
+            f"{stats.percentiles[1]:.2f} ms",
         )
 
         console = Console()
