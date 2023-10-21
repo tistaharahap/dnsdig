@@ -1,10 +1,11 @@
-from dnsdig.libdns.constants import RecordTypes
+from dns.rdatatype import RdataType
+
 from dnsdig.libshared.models import BaseMongoDocument
 
 
 class Analytics(BaseMongoDocument):
     name: str
-    record_type: RecordTypes
+    record_type: RdataType
     resolve_time: float
     ttl: int
 

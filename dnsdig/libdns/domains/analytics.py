@@ -28,17 +28,6 @@ class DNSAnalytics:
         await init_beanie(database=mongo_client[dnsdigd_settings.db_name], document_models=collections)
 
     async def log_resolver(self, name: str, record_type: RdataType, resolve_time: float, ttl: int) -> Analytics:
-        rtype_map = {
-            RdataType.A: RecordTypes.A,
-            RdataType.AAAA: RecordTypes.AAAA,
-            RdataType.MX: RecordTypes.MX,
-            RdataType.NS: RecordTypes.NS,
-            RdataType.CNAME: RecordTypes.CNAME,
-            RdataType.TXT: RecordTypes.TXT,
-            RdataType.SOA: RecordTypes.SOA,
-            RdataType.PTR: RecordTypes.PTR,
-            RdataType.SRV: RecordTypes.SRV,
-        }
-        row = Analytics(name=name, record_type=rtype_map.get(record_type), resolve_time=resolve_time, ttl=ttl)
+        row = Analytics(name=name, record_type=record_type, resolve_time=resolve_time, ttl=ttl)
         await row.save()
         return row
