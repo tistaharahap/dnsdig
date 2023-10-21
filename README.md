@@ -117,6 +117,30 @@ $ docker run -d --name dnsdig -p 8080:8080 \
 | `THROTTLER_SECONDS`           | Required string                         |
 | `IPINFO_HOST`                 | Required string                         |
 | `IPINFO_TOKEN`                | Required string                         |
+| `HOST`                        | Required string                         |
+| `PORT`                        | Required string                         |
+
+## DNS Dig Daemon
+
+Included with this repo is a small daemon that accepts UDP DNS requests, forwards them to Google's DoH (DNS over HTTPS) DNS server and then response back to the UDP client. The main goal is to have my own UDP DNS server for my network at home.
+
+For now it's a dumb forwarder but later in the future I want to log DNS resolution times and maybe cache the responses.
+
+### Environment Variables
+
+| Name                          | Description                             |
+|:------------------------------|:----------------------------------------|
+| `HOST`                        | Required string                         |
+| `PORT`                        | Required string                         |
+
+### Getting Started
+
+```bash
+$ chmod +x run.sh
+$ APP=dnsdigd ./run.sh
+```
+
+The daemon be default will serve at `127.0.0.1:5053`.
 
 ## Why Build This?
 
