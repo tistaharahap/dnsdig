@@ -87,6 +87,9 @@ class DNSDigUDPServer:
             delta = (end_time - start_time) * 1000
             logger.info(f"[{data.id}] Query took {int(delta)} ms")
 
+            logger.info(f"[{data.id}] Sending response to {addr} - {question.get('name')} {question.get('type')}")
+            self.socket.sendto(dns_response.to_wire(), addr)
+
             # Log if we get an answer
             if len(dns_response.answer) > 0:
                 await self.analytics.log_resolver(
@@ -95,9 +98,6 @@ class DNSDigUDPServer:
                     resolve_time=delta,
                     ttl=dns_response.answer[0].ttl,
                 )
-
-            logger.info(f"[{data.id}] Sending response to {addr} - {question.get('name')} {question.get('type')}")
-            self.socket.sendto(dns_response.to_wire(), addr)
 
     async def start(self):
         if not self.socket:
