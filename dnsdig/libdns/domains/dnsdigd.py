@@ -1,3 +1,4 @@
+import asyncio
 import time
 from typing import Dict
 
@@ -10,6 +11,7 @@ from dns.rdatatype import RdataType
 
 from dnsdig.appdnsdigd.settings import dnsdigd_settings
 from dnsdig.libdns.domains.analytics import DNSAnalytics
+from dnsdig.libdns.models.analytics import Analytics, StatsTimeframes
 from dnsdig.libdns.utils import to_doh_simple, from_doh_simple
 from dnsdig.libshared.logging import logger
 
@@ -55,6 +57,23 @@ class DNSDigUDPServer:
                     ttl = answer.get("TTL", 0)
                     await redis_client.set(cache_key, ujson.encode(response), ex=ttl)
             return response
+
+    @classmethod
+    async def output_stats(cls):
+        while True:
+            stats = await Analytics.statistics(timeframe=StatsTimeframes.Minutes60)
+            if stats:
+                logger.info("")
+                logger.info("==============================")
+                logger.info("Per Minute Stats (last 1 hour)")
+                logger.info("==============================")
+                logger.info(f"Average: {stats.average:.2f} ms")
+                logger.info(f" Median: {stats.median:.2f} ms")
+                logger.info(f"Minimum: {stats.minimum:.2f} ms")
+                logger.info(f"Maximum: {stats.maximum:.2f} ms")
+                logger.info("==============================")
+                logger.info("")
+            await asyncio.sleep(60)
 
     async def run_forever(self, session: aiohttp.ClientSession):
         while True:
@@ -113,4 +132,4 @@ class DNSDigUDPServer:
         # Use dns cache for aiohttp since we are using a single session
         conn = aiohttp.TCPConnector(ttl_dns_cache=86400)
         async with aiohttp.ClientSession(connector=conn) as session:
-            await self.run_forever(session=session)
+            await asyncio.gather(self.run_forever(session=session), DNSDigUDPServer.output_stats())
