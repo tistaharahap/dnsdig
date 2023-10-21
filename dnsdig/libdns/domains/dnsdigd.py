@@ -8,10 +8,10 @@ import redis.asyncio as redis
 import ujson
 from dns.rdatatype import RdataType
 
+from dnsdig.appdnsdigd.settings import dnsdigd_settings
 from dnsdig.libdns.domains.analytics import DNSAnalytics
 from dnsdig.libdns.utils import to_doh_simple, from_doh_simple
 from dnsdig.libshared.logging import logger
-from dnsdig.libshared.settings import settings
 
 
 class DNSDigUDPServer:
@@ -24,7 +24,7 @@ class DNSDigUDPServer:
         self.use_cache = use_cache
         self.redis_client: redis.Redis | None = None
         if self.use_cache:
-            self.redis_client = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
+            self.redis_client = redis.from_url(dnsdigd_settings.redis_url, encoding="utf-8", decode_responses=True)
 
         # Analytics
         self.analytics: DNSAnalytics | None = None

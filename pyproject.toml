@@ -5,6 +5,9 @@ description = "The API for DNS lookups"
 authors = ["Batista Harahap <batista@bango29.com>"]
 readme = "README.md"
 
+[tool.poetry.scripts]
+dnsdigd = "dnsdig.appdnsdigd.dnsdigd:app"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.103.2"
