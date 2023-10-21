@@ -33,7 +33,7 @@ class Analytics(BaseMongoDocument):
     ttl: int
 
     @classmethod
-    async def statistics(cls, timeframe: StatsTimeframes):
+    async def statistics(cls, timeframe: StatsTimeframes) -> AnalyticsResults | None:
         upper_bound = datetime.utcnow()
         lower_bound = upper_bound - timedelta(minutes=timeframe.value)
 

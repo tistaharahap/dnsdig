@@ -8,10 +8,12 @@ import dns.message
 import redis.asyncio as redis
 import ujson
 from dns.rdatatype import RdataType
+from rich.console import Console
+from rich.table import Table
 
 from dnsdig.appdnsdigd.settings import dnsdigd_settings
 from dnsdig.libdns.domains.analytics import DNSAnalytics
-from dnsdig.libdns.models.analytics import Analytics, StatsTimeframes
+from dnsdig.libdns.models.analytics import Analytics, StatsTimeframes, AnalyticsResults
 from dnsdig.libdns.utils import to_doh_simple, from_doh_simple
 from dnsdig.libshared.logging import logger
 
@@ -59,20 +61,31 @@ class DNSDigUDPServer:
             return response
 
     @classmethod
+    def render_stats_table(cls, stats: AnalyticsResults, timeframe: StatsTimeframes):
+        print("\n")
+        table = Table(
+            "Average",
+            "Median",
+            "Minimum",
+            "Maximum",
+            title="Per Minute Stats",
+            title_justify="center",
+            caption=f"Last {timeframe.value} minutes",
+        )
+        table.add_row(
+            f"{stats.average:.2f} ms", f"{stats.median:.2f} ms", f"{stats.minimum:.2f} ms", f"{stats.maximum:.2f} ms"
+        )
+
+        console = Console()
+        console.print(table)
+        print("\n")
+
+    @classmethod
     async def output_stats(cls):
         while True:
             stats = await Analytics.statistics(timeframe=StatsTimeframes.Minutes60)
             if stats:
-                logger.info("")
-                logger.info("==============================")
-                logger.info("Per Minute Stats (last 1 hour)")
-                logger.info("==============================")
-                logger.info(f"Average: {stats.average:.2f} ms")
-                logger.info(f" Median: {stats.median:.2f} ms")
-                logger.info(f"Minimum: {stats.minimum:.2f} ms")
-                logger.info(f"Maximum: {stats.maximum:.2f} ms")
-                logger.info("==============================")
-                logger.info("")
+                cls.render_stats_table(stats=stats, timeframe=StatsTimeframes.Minutes60)
             await asyncio.sleep(60)
 
     async def run_forever(self, session: aiohttp.ClientSession):
