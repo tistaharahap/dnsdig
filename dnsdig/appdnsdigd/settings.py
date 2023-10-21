@@ -6,8 +6,11 @@ from pydantic_settings import BaseSettings
 
 
 class DNSDigdSettings(BaseSettings):
+    app_name: str = "dnsdigd"
+    db_name: str = "dnsdigd"
     port: int = 5053
     host: str = "127.0.0.1"
+    mongo_url: str | None = "mongodb://localhost:27017"
 
     @classmethod
     @lru_cache()
