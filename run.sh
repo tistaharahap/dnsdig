@@ -51,5 +51,5 @@ elif test "x${APP}" = 'xdnsdigd'; then
   if test "x${HOST}" = 'x'; then
     export HOST=127.0.0.1
   fi
-  dnsdigd --host $HOST --port $PORT
+  python dnsdigd.py --host $HOST --port $PORT
 fi

@@ -1,10 +1,30 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 from enum import Enum
 from typing import List
 
+from beanie import Document, ValidateOnSave, Update, before_event
 from dns.rdatatype import RdataType
+from humps import camelize
+from pydantic import BaseModel, Field, ConfigDict
 
-from dnsdig.libshared.models import BaseMongoDocument, BaseRequestResponse
+
+class BaseDatetimeMeta(BaseModel):
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime | None = None
+    deleted_at: datetime | None = None
+
+
+class BaseMongoDocument(Document, BaseDatetimeMeta):
+    @before_event(ValidateOnSave, Update)
+    async def update_timestamps(self):
+        self.updated_at = datetime.utcnow()
+
+
+class BaseRequestResponse(BaseModel):
+    model_config = ConfigDict(
+        use_enum_values=True, alias_generator=camelize, json_encoders={Decimal: str}, populate_by_name=True
+    )
 
 
 class StatsTimeframes(int, Enum):
