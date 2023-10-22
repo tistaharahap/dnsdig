@@ -7,8 +7,7 @@ from dns.rdatatype import RdataType
 from motor import motor_asyncio
 
 from dnsdig.appdnsdigd.settings import dnsdigd_settings
-from dnsdig.libdns.constants import RecordTypes
-from dnsdig.libdns.models.analytics import Analytics
+from dnsdig.appdnsdigd.analyticsmongo import Analytics
 
 
 class DNSAnalytics:

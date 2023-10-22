@@ -2,7 +2,7 @@ import typer
 import uvloop
 
 from dnsdig.appdnsdigd.settings import dnsdigd_settings
-from dnsdig.libdns.domains.dnsdigd import DNSDigUDPServer
+from dnsdig.appdnsdigd.udpserver import DNSDigUDPServer
 
 app = typer.Typer()
 

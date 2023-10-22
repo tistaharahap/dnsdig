@@ -12,9 +12,9 @@ from rich.console import Console
 from rich.table import Table
 
 from dnsdig.appdnsdigd.settings import dnsdigd_settings
-from dnsdig.libdns.domains.analytics import DNSAnalytics
-from dnsdig.libdns.models.analytics import Analytics, StatsTimeframes, AnalyticsResults
-from dnsdig.libdns.utils import to_doh_simple, from_doh_simple
+from dnsdig.appdnsdigd.analytics import DNSAnalytics
+from dnsdig.appdnsdigd.analyticsmongo import Analytics, StatsTimeframes, AnalyticsResults
+from dnsdig.appdnsdigd.utils import to_doh_simple, from_doh_simple
 from dnsdig.libshared.logging import logger
 
 
