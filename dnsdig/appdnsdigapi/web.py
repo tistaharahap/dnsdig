@@ -1,4 +1,5 @@
 import redis.asyncio as redis
+import sentry_sdk
 from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
@@ -60,3 +61,11 @@ async def swagger():
 
 
 app.include_router(dnsdig_router, prefix="/v1")
+
+# Sentry setup
+if settings.sentry_dsn == Environments.Production and settings.sentry_dsn:
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        traces_sample_rate=settings.sentry_sample_rate,
+        profiles_sample_rate=settings.sentry_sample_rate,
+    )

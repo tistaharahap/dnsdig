@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     ipinfo_host: str
     ipinfo_token: str
     cors_origins: List[str] = Field(default_factory=list)
+    sentry_dsn: str | None = None
+    sentry_sample_rate: float | None = 0.1
 
     # Throttler
     throttler_times: int = 30
