@@ -3,6 +3,7 @@ from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi_limiter import FastAPILimiter
+from starlette.middleware.cors import CORSMiddleware
 
 from dnsdig.appdnsdigapi.views import router as dnsdig_router
 from dnsdig.libaccount.models.mongo import User, OAuthSession
@@ -33,6 +34,14 @@ app_params = {
     'redoc_url': None,
 }
 app = FastAPI(**app_params, on_startup=[beanie_setup, limiter_setup])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/healthcheck", status_code=200, tags=['System'])
