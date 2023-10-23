@@ -36,11 +36,7 @@ app_params = {
 app = FastAPI(**app_params, on_startup=[beanie_setup, limiter_setup])
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
 )
 
 
