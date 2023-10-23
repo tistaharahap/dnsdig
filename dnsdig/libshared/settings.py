@@ -1,6 +1,6 @@
 from enum import Enum
 from functools import lru_cache
-from typing import List, Any
+from typing import List
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -38,19 +38,12 @@ class Settings(BaseSettings):
     throttler_times: int = 30
     throttler_seconds: int = 60
 
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
     @property
     def db_name(self) -> str:
         db_postfix = settings.env.value if not settings.testing == Environments.Testing else "test"
         return f"dnsdig-{db_postfix}"
-
-    class Config:
-        env_file = ".env",
-        extra = "ignore"
-
-        @classmethod
-        def parse_env_var(cls, field_name: str, raw_val: str) -> Any:
-            if field_name == "cors_origins":
-                return raw_val.split(",")
 
 
 @lru_cache()
