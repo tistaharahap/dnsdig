@@ -150,6 +150,9 @@ class Account:
 
     @classmethod
     async def create_application(cls, payload: CreateApplicationRequest, context: Context) -> UserApplicationResponse:
+        if context.access_token and context.access_token.startswith("m2m"):
+            raise HTTPException(status_code=403, detail="You cannot create applications using an M2M token")
+
         application = UserApplication(
             name=payload.name,
             description=payload.description,
