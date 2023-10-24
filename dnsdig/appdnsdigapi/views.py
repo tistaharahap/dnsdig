@@ -1,13 +1,18 @@
 import asyncio
-from typing import Dict
+from typing import Dict, List
 
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_limiter.depends import RateLimiter
 
 from dnsdig.libaccount.domains.account import Account
-from dnsdig.libaccount.models.auth import LoginUrlRequest, Permissions
-from dnsdig.libaccount.models.responses import LoginUrlResponse, AccessTokenResponse
+from dnsdig.libaccount.models.auth import (
+    LoginUrlRequest,
+    Permissions,
+    CreateApplicationRequest,
+    ClientCredentialsRequest,
+)
+from dnsdig.libaccount.models.responses import LoginUrlResponse, AccessTokenResponse, UserApplicationResponse
 from dnsdig.libdns.constants import RecordTypes
 from dnsdig.libdns.domains.resolver import ResolverResult, Resolver
 from dnsdig.libshared.context import Context
@@ -152,3 +157,48 @@ async def kinde_callback(refresh_token: str, mongo_client: MongoClient = Depends
     async with mongo_client.transaction():
         async with Context.public():
             return await Account.exchange_for_access_token(code=refresh_token, refresh_exchange=True)
+
+
+@router.post(
+    "/oauth2/token",
+    summary="Get access token from client credentials",
+    tags=["Me", "OAuth", "Applications"],
+    response_model=AccessTokenResponse,
+)
+async def token_from_credentials(
+    payload: ClientCredentialsRequest, mongo_client: MongoClient = Depends(MongoClientDependency())
+):
+    async with mongo_client.transaction():
+        async with Context.public():
+            return await Account.m2m_client_credentials_exchange(payload=payload)
+
+
+@router.post(
+    "/me/applications",
+    summary="Create an application for a user",
+    tags=["Me", "Applications"],
+    response_model=UserApplicationResponse,
+)
+async def create_app(
+    payload: CreateApplicationRequest,
+    mongo_client: MongoClient = Depends(MongoClientDependency()),
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
+):
+    async with mongo_client.transaction():
+        async with Context.protected(authorization=credentials, permissions=[]) as ctx:
+            return await Account.create_application(payload=payload, context=ctx)
+
+
+@router.get(
+    "/me/applications",
+    summary="List all my applications",
+    tags=["Me", "Applications"],
+    response_model=List[UserApplicationResponse],
+)
+async def list_app(
+    mongo_client: MongoClient = Depends(MongoClientDependency()),
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
+):
+    async with mongo_client.transaction():
+        async with Context.protected(authorization=credentials, permissions=[]) as ctx:
+            return await Account.list_applications(context=ctx)

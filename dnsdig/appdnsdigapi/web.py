@@ -7,7 +7,7 @@ from fastapi_limiter import FastAPILimiter
 from starlette.middleware.cors import CORSMiddleware
 
 from dnsdig.appdnsdigapi.views import router as dnsdig_router
-from dnsdig.libaccount.models.mongo import User, OAuthSession
+from dnsdig.libaccount.models.mongo import User, OAuthSession, Token
 from dnsdig.libshared.logging import logger
 from dnsdig.libshared.models import mongo_client
 from dnsdig.libshared.settings import settings, Environments
@@ -17,7 +17,7 @@ async def beanie_setup():
     if settings.env == Environments.Dev:
         logger.info(f"Mongo URL: {settings.mongo_url} - {settings.db_name}")
     logger.info("Initializing MongoDB - Start")
-    collections = [User, OAuthSession]
+    collections = [User, OAuthSession, Token]
     await init_beanie(database=mongo_client[settings.db_name], document_models=collections)
     logger.info("Initializing MongoDB - End")
 

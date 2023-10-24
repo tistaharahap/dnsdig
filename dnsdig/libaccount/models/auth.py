@@ -28,3 +28,15 @@ admin_role = RoleAndPermissions(role=Roles.Admin, permissions=[Permissions.ReadR
 class LoginUrlRequest(BaseRequestResponse):
     state: constr(min_length=8) | None = None
     store: Dict[str, Any] | None = None
+
+
+class CreateApplicationRequest(BaseRequestResponse):
+    name: str
+    description: str | None = None
+    website: str | None = None
+
+
+class ClientCredentialsRequest(BaseRequestResponse):
+    client_id: str
+    client_secret: str
+    grant_type: str = "client_credentials"
