@@ -40,3 +40,8 @@ class ClientCredentialsRequest(BaseRequestResponse):
     client_id: str
     client_secret: str
     grant_type: str = "client_credentials"
+
+
+class RefreshTokenExchangeRequest(BaseRequestResponse):
+    refresh_token: str
+    grant_type: str = "refresh_token"

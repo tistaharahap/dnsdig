@@ -17,6 +17,7 @@ from dnsdig.libaccount.models.auth import (
     LoginUrlRequest,
     CreateApplicationRequest,
     ClientCredentialsRequest,
+    RefreshTokenExchangeRequest,
 )
 from dnsdig.libaccount.models.mongo import User, OAuthSession, UserApplication, Token
 from dnsdig.libaccount.models.responses import LoginUrlResponse, AccessTokenResponse, UserApplicationResponse
@@ -206,6 +207,50 @@ class Account:
         return AccessTokenResponse(
             access_token=_access_token,
             refresh_token=_refresh_token,
+            expires_in=TokenLifetimes.M2M.value,
+            scope=" ".join([perm.value for perm in app.permissions]),
+            token_type="bearer",
+        )
+
+    @classmethod
+    async def m2m_refresh_token_exchange(cls, payload: RefreshTokenExchangeRequest) -> AccessTokenResponse:
+        if payload.grant_type != "refresh_token":
+            raise HTTPException(status_code=400, detail="Only refresh_token grant type is supported")
+
+        now = datetime.utcnow()
+
+        refresh_token = await Token.get_token(token=payload.refresh_token, token_type=TokenTypes.M2MRefreshToken)
+        if not refresh_token:
+            raise HTTPException(status_code=400, detail="Invalid refresh token")
+
+        if refresh_token.expires_at < now:
+            raise HTTPException(status_code=400, detail="Refresh token expired")
+
+        app = await User.get_app_by_client_id(client_id=refresh_token.owner_id)
+        if not app:
+            raise HTTPException(status_code=400, detail="Unknown token owner")
+
+        _access_token = f"{app.client_id}-{token_hex(55)}-{token_hex(72)}"
+        _refresh_token = f"{app.client_id}-{token_hex(55)}"
+
+        access_token = Token(
+            token=_access_token,
+            token_type=TokenTypes.M2M,
+            expires_at=now + timedelta(seconds=TokenLifetimes.M2M.value),
+            owner_id=app.client_id,
+        )
+        await access_token.save()
+        refresh_token = Token(
+            token=_refresh_token,
+            token_type=TokenTypes.M2MRefreshToken,
+            expires_at=now + timedelta(seconds=TokenLifetimes.M2MRefreshToken.value),
+            owner_id=app.client_id,
+        )
+        await refresh_token.save()
+
+        return AccessTokenResponse(
+            access_token=access_token.token,
+            refresh_token=refresh_token.token,
             expires_in=TokenLifetimes.M2M.value,
             scope=" ".join([perm.value for perm in app.permissions]),
             token_type="bearer",

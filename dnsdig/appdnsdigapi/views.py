@@ -1,7 +1,7 @@
 import asyncio
 from typing import Dict, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_limiter.depends import RateLimiter
 
@@ -11,6 +11,7 @@ from dnsdig.libaccount.models.auth import (
     Permissions,
     CreateApplicationRequest,
     ClientCredentialsRequest,
+    RefreshTokenExchangeRequest,
 )
 from dnsdig.libaccount.models.responses import LoginUrlResponse, AccessTokenResponse, UserApplicationResponse
 from dnsdig.libdns.constants import RecordTypes
@@ -161,16 +162,23 @@ async def kinde_callback(refresh_token: str, mongo_client: MongoClient = Depends
 
 @router.post(
     "/oauth2/token",
-    summary="Get access token from client credentials",
+    summary="Generate access token from client credentials",
     tags=["Me", "OAuth", "Applications"],
     response_model=AccessTokenResponse,
 )
 async def token_from_credentials(
-    payload: ClientCredentialsRequest, mongo_client: MongoClient = Depends(MongoClientDependency())
+    payload: ClientCredentialsRequest | RefreshTokenExchangeRequest,
+    mongo_client: MongoClient = Depends(MongoClientDependency()),
 ):
     async with mongo_client.transaction():
         async with Context.public():
-            return await Account.m2m_client_credentials_exchange(payload=payload)
+            match payload.grant_type:
+                case "client_credentials":
+                    return await Account.m2m_client_credentials_exchange(payload=payload)
+                case "refresh_token":
+                    return await Account.m2m_refresh_token_exchange(payload=payload)
+                case _:
+                    raise HTTPException(status_code=400, detail="Invalid grant_type")
 
 
 @router.post(

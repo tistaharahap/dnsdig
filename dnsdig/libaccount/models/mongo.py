@@ -78,5 +78,10 @@ class Token(BaseMongoDocument):
     expires_at: datetime
     owner_id: str
 
+    @classmethod
+    async def get_token(cls, token: str, token_type: TokenTypes) -> Token | None:
+        query = {"token": token, "token_type": token_type}
+        return await monq_find_one(model=cls, query=query, project_to=cls)
+
     class Settings:
         name: str = "tokens"
