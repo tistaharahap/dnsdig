@@ -5,6 +5,7 @@ import time
 import asyncudp
 import dns.message
 import redis.asyncio as redis
+from asyncer import asyncify
 from rich.console import Console
 from rich.table import Table
 
@@ -103,7 +104,7 @@ class DNSDigUDPServer:
             dns_response.id = data.id
 
             logger.info(f"[{data.id}] Sending response for {data.question[0].name} {data.question[0].rdtype}")
-            self.socket.sendto(dns_response.to_wire(), addr)
+            await asyncify(self.socket.sendto)(dns_response.to_wire(), addr)
 
             if len(dns_response.answer) > 0:
                 await self.analytics.log_resolver(
