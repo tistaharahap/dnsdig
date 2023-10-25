@@ -192,8 +192,10 @@ async def create_app(
     mongo_client: MongoClient = Depends(MongoClientDependency()),
     credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
 ):
+    permissions = [Permissions.ReadApplication, Permissions.WriteApplication]
+
     async with mongo_client.transaction():
-        async with Context.protected(authorization=credentials, permissions=[]) as ctx:
+        async with Context.protected(authorization=credentials, permissions=permissions) as ctx:
             return await Account.create_application(payload=payload, context=ctx)
 
 
@@ -207,6 +209,8 @@ async def list_app(
     mongo_client: MongoClient = Depends(MongoClientDependency()),
     credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
 ):
+    permissions = [Permissions.ReadApplication]
+
     async with mongo_client.transaction():
-        async with Context.protected(authorization=credentials, permissions=[]) as ctx:
+        async with Context.protected(authorization=credentials, permissions=permissions) as ctx:
             return await Account.list_applications(context=ctx)

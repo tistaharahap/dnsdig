@@ -9,11 +9,14 @@ from dnsdig.libshared.models import BaseRequestResponse
 class Permissions(str, Enum):
     ReadResolver = "read:resolver"
     WriteResolver = "write:resolver"
+    ReadApplication = "read:application"
+    WriteApplication = "write:application"
 
 
 class Roles(str, Enum):
     Resolver = "resolver"
     Admin = "admin"
+    PaidUser = "paid-user"
 
 
 class RoleAndPermissions(BaseModel):
@@ -23,6 +26,13 @@ class RoleAndPermissions(BaseModel):
 
 resolver_role = RoleAndPermissions(role=Roles.Resolver, permissions=[Permissions.ReadResolver])
 admin_role = RoleAndPermissions(role=Roles.Admin, permissions=[Permissions.ReadResolver, Permissions.WriteResolver])
+paid_user_role = RoleAndPermissions(
+    role=Roles.PaidUser,
+    permissions=[
+        Permissions.ReadApplication,
+        Permissions.WriteApplication,
+    ],
+)
 
 
 class LoginUrlRequest(BaseRequestResponse):
