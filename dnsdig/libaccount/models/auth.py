@@ -27,11 +27,7 @@ class RoleAndPermissions(BaseModel):
 resolver_role = RoleAndPermissions(role=Roles.Resolver, permissions=[Permissions.ReadResolver])
 admin_role = RoleAndPermissions(role=Roles.Admin, permissions=[Permissions.ReadResolver, Permissions.WriteResolver])
 paid_user_role = RoleAndPermissions(
-    role=Roles.PaidUser,
-    permissions=[
-        Permissions.ReadApplication,
-        Permissions.WriteApplication,
-    ],
+    role=Roles.PaidUser, permissions=[Permissions.ReadApplication, Permissions.WriteApplication]
 )
 
 

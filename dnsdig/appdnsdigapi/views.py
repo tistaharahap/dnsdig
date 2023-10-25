@@ -162,7 +162,7 @@ async def kinde_callback(refresh_token: str, mongo_client: MongoClient = Depends
 
 @router.post(
     "/oauth2/token",
-    summary="Generate access token from client credentials",
+    summary="Generate access token for several grant types for M2M apps",
     tags=["Me", "OAuth", "Applications"],
     response_model=AccessTokenResponse,
 )
