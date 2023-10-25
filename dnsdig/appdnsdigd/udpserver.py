@@ -76,14 +76,14 @@ class DNSDigUDPServer:
         name = message.question[0].name
         rtype = message.question[0].rdtype
         ns = f"dnsdigd-cache#{name}#{rtype}"
-        print(ns)
         cached = await self.redis_client.get(ns)
         if cached:
             logger.info(f"Cache hit for {name} {rtype}")
             return dns.message.from_text(cached)
 
         response = await dns.asyncquery.tls(message, where=self.resolver)
-        await self.redis_client.set(ns, response.to_text(), ex=response.answer[0].ttl)
+        if len(response.answer) > 0:
+            await self.redis_client.set(ns, response.to_text(), ex=response.answer[0].ttl)
         return response
 
     async def run_forever(self):
