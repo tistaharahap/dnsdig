@@ -79,11 +79,17 @@ class DNSDigUDPServer:
         cached = await self.redis_client.get(ns)
         if cached:
             logger.info(f"Cache hit for {name} {rtype}")
-            return dns.message.from_text(cached)
+            try:
+                return dns.message.from_text(cached)
+            except dns.message.UnknownHeaderField:
+                logger.error(f"Failed to parse cached response for {name} {rtype}")
 
         response = await dns.asyncquery.tls(message, where=self.resolver)
         if len(response.answer) > 0:
-            await self.redis_client.set(ns, response.to_text(), ex=response.answer[0].ttl)
+            ttl = response.answer[0].ttl
+            if not ttl:
+                return response
+            await self.redis_client.set(ns, response.to_text(), ex=ttl)
         return response
 
     async def run_forever(self):
