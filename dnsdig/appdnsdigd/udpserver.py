@@ -6,6 +6,8 @@ import asyncudp
 import dns.message
 import redis.asyncio as redis
 from asyncer import asyncify
+from dns.rdataclass import RdataClass
+from dns.rdatatype import RdataType
 from rich.console import Console
 from rich.table import Table
 
@@ -16,10 +18,18 @@ from dnsdig.libshared.logging import logger
 
 
 class DNSDigUDPServer:
-    def __init__(self, host: str, port: int, socket: asyncudp.Socket | None = None, use_cache: bool = True):
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        socket: asyncudp.Socket | None = None,
+        use_cache: bool = True,
+        use_adblocker: bool = False,
+    ):
         self.host = host
         self.port = port
         self.socket = socket
+        self.use_adblocker = use_adblocker
 
         # Caching
         self.use_cache = use_cache
@@ -75,6 +85,19 @@ class DNSDigUDPServer:
     async def query_dns_tls(self, message: dns.message.Message) -> dns.message.Message:
         name = message.question[0].name
         rtype = message.question[0].rdtype
+
+        # Ad blocker interceptor
+        if rtype == RdataType.A and self.use_adblocker:
+            ns = "dnsdigd-blacklist"
+            blackholed = await self.redis_client.hget(ns, str(name)[:-1])
+            if blackholed:
+                logger.info("Blackholed")
+                rrset = dns.rrset.from_text_list(
+                    name=name, ttl=86400, rdclass=RdataClass.IN, rdtype=RdataType.A, text_rdatas=[blackholed]
+                )
+                message.answer.append(rrset)
+                return message
+
         ns = f"dnsdigd-cache#{name}#{rtype}"
         cached = await self.redis_client.get(ns)
         if cached:
