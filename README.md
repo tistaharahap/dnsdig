@@ -14,4 +14,4 @@ $ curl -sSL https://install.python-poetry.org | python3.11 -
 
 Complete steps are written in the documentation site:
 
-[https://tistaharahap.github.io/dnsdig/](https://tistaharahap.github.io/dnsdig/).
+[https://tistaharahap.github.io/dnsdig/](https://tistaharahap.github.io/dnsdig/)
