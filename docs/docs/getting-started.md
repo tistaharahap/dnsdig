@@ -1,10 +1,10 @@
 # Getting Started
 
-Python 3.11 is required to run this project. If you don't have it installed, you can use [pyenv](https://github.com/pyenv/pyenv).
+Python 3.11 is required to run this project. If you don't have it installed, you can use [pyenv](https://github.com/pyenv/pyenv){:target="_blank"}.
 
 ## Poetry
 
-Dependencies are managed by [Poetry](https://python-poetry.org/). Install Poetry and then install the dependencies.
+Dependencies are managed by [Poetry](https://python-poetry.org/){:target="_blank"}. Install Poetry and then install the dependencies.
 
 ```bash
 $ curl -sSL https://install.python-poetry.org | python3.11 -
@@ -22,7 +22,7 @@ $ poetry install
 
 ### Kinde
 
-Go to [Kinde](https://kinde.com) and create an account. Then create a new project and add a new API. You'll need the Client ID, Client Secret and Kinde's host for your project to run. Included with this repo is an example `.env` file.
+Go to [Kinde](https://kinde.com){:target="_blank"} and create an account. Then create a new project and add a new API. You'll need the Client ID, Client Secret and Kinde's host for your project to run. Included with this repo is an example `.env` file.
 
 In Kinde, add `http://localhost:8080/v1/callbacks/kinde` as a callback URL for your API.
 
@@ -52,7 +52,7 @@ The API will be available at `http://localhost:8080` and the docs will be availa
 
 Before you can make requests to the protected endpoints, you'll need to create a user. Assuming that the API is running, use the API docs and go to the link below:
 
-[http://localhost:8080/docs#/Me/get_login_url_v1_me_login_url_post](http://localhost:8080/docs#/Me/get_login_url_v1_me_login_url_post)
+[http://localhost:8080/docs#/Me/get_login_url_v1_me_login_url_post](http://localhost:8080/docs#/Me/get_login_url_v1_me_login_url_post){:target="_blank"}
 
 Click the `Try it out` button, use an empty body in `Request Body` by entering `{}` and then click the `Execute` button.
 

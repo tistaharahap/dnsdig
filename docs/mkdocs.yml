@@ -1,6 +1,6 @@
 site_name: DNSDig Docs Site
 nav:
-  - Home: index.md
+  - DNSDig: index.md
   - Getting Started: getting-started.md
   - DNSDig API: dnsdig-api.md
   - DNSDigd: dnsdigd.md
@@ -40,6 +40,7 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - attr_list
 repo_url: https://github.com/tistaharahap/dnsdig
 repo_name: tistaharahap/dnsdig
 extra:

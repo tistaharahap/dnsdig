@@ -1,18 +1,18 @@
 # DNSDig API
 
-As mentioned before, DNSDig API is built on top of [FastAPI](https://fastapi.tiangolo.com/), [Pydantic](https://pydantic-docs.helpmanual.io/) and [DNSPython](https://www.dnspython.org/). Authentication and authorization is handled by [Kinde](https://kinde.com). [MongoDB](https://www.mongodb.com) is the choice for the database and [Redis](https://redis.io/) is used for rate limiting so far.
+As mentioned before, DNSDig API is built on top of [FastAPI](https://fastapi.tiangolo.com/){:target="_blank"}, [Pydantic](https://pydantic-docs.helpmanual.io/){:target="_blank"} and [DNSPython](https://www.dnspython.org/){:target="_blank"}. Authentication and authorization is handled by [Kinde](https://kinde.com){:target="_blank"}. [MongoDB](https://www.mongodb.com){:target="_blank"} is the choice for the database and [Redis](https://redis.io/){:target="_blank"} is used for rate limiting so far.
 
-This started as a hack and challenge to finish in 24 hours but I can say that it's still a work in progress. The API is deployed at [https://dnsdig-api.bango29.com](https://dnsdig-api.bango29.com) and the endpoint docs are available at [https://dnsdig-api.bango29.com/docs](https://dnsdig-api.bango29.com/docs). The API is free to use but rate limited as described further down in this page. 
+This started as a hack and challenge to finish in 24 hours but I can say that it's still a work in progress. The API is deployed at [https://dnsdig-api.bango29.com](https://dnsdig-api.bango29.com){:target="_blank"} and the endpoint docs are available at [https://dnsdig-api.bango29.com/docs](https://dnsdig-api.bango29.com/docs){:target="_blank"}. The API is free to use but rate limited as described further down in this page. 
 
 Register for an account and create an application if you want to use the API without rate limits.
 
 ## Authentication & Authorization
 
-Kinde is responsible to issue access tokens, refresh tokens and revoke tokens. DNSDig API will only accept access tokens issued by Kinde. The access token is passed in the `Authorization` header with the `Bearer` scheme. The access tokens are issued as [JWT](https://jwt.io) tokens.
+Kinde is responsible to issue access tokens, refresh tokens and revoke tokens. DNSDig API will only accept access tokens issued by Kinde. The access token is passed in the `Authorization` header with the `Bearer` scheme. The access tokens are issued as [JWT](https://jwt.io){:target="_blank"} tokens.
 
 ### User Flow
 
-DNSDig API uses [OAuth 2.0](https://oauth.net/2/) to authenticate users indirectly by using Kinde. The followings are sequence diagrams of how the authentication flow works. The intended audience for this flow are humans using a web browser.
+DNSDig API uses [OAuth 2.0](https://oauth.net/2/){:target="_blank"} to authenticate users indirectly by using Kinde. The followings are sequence diagrams of how the authentication flow works. The intended audience for this flow are humans using a web browser.
 
 #### Login/Register Flow
 
@@ -106,7 +106,7 @@ sequenceDiagram
 
 ## Rate Limits
 
-In DNSDig, access tokens are used for certain endpoints to avoid rate limiting. Requests that are authorized with access tokens will have an unlimited rate limit from the API's perspective than requests that are not authorized with access tokens. Rate limiting authorized requests is delegated to a reverse proxy like [nginx](https://nginx.org/en/) or [Traefik](https://traefik.io/). DNSDig's [publicly reachable API](https://dnsdig-api.bango29.com/docs) is deployed behind Cloudflare, therefore Cloudflare's policy applies.
+In DNSDig, access tokens are used for certain endpoints to avoid rate limiting. Requests that are authorized with access tokens will have an unlimited rate limit from the API's perspective than requests that are not authorized with access tokens. Rate limiting authorized requests is delegated to a reverse proxy like [nginx](https://nginx.org/en/){:target="_blank"} or [Traefik](https://traefik.io/){:target="_blank"}. DNSDig's [publicly reachable API](https://dnsdig-api.bango29.com/docs){:target="_blank"} is deployed behind Cloudflare, therefore Cloudflare's policy applies.
 
 ### Rate Limited Endpoints
 
@@ -121,7 +121,7 @@ The endpoints' rate limit is configurable via these environment variables:
 
 ### Implementation
 
-Rate limiting is implemented by using the [fastapi-limiter](https://github.com/long2ice/fastapi-limiter) library. In practice Redis is required to maintain the state of the rate limit. The Redis connection is configured via the `REDIS_URL` environment variable. Below is taken from a public endpoint protected with the rate limiter. The `settings` variable is a Pydantic `BaseSettings` class that is used to read environment variables and or `.env` files.
+Rate limiting is implemented by using the [fastapi-limiter](https://github.com/long2ice/fastapi-limiter){:target="_blank"} library. In practice Redis is required to maintain the state of the rate limit. The Redis connection is configured via the `REDIS_URL` environment variable. Below is taken from a public endpoint protected with the rate limiter. The `settings` variable is a Pydantic `BaseSettings` class that is used to read environment variables and or `.env` files.
 
 ```python linenums="1"
 @router.get(
@@ -183,7 +183,7 @@ Anywhere in the codebase, it's encouraged to raise exceptions instead of returni
 
 ## IPv6 Support
 
-DNSDig API is built on top of [dnspython](https://www.dnspython.org/) in which IPv6 resolvers are supported. However, depending on your own network setup, DNSDig API might not be able to resolve records using IPv6 resolvers. For this reason, IPv6 endpoints are dedicated and ends with a `6` prefix. If your network supports IPv6 and a request is made to one of the IPv6 endpoints, the API will use IPv6 resolvers to resolve the records.
+DNSDig API is built on top of [dnspython](https://www.dnspython.org/){:target="_blank"} in which IPv6 resolvers are supported. However, depending on your own network setup, DNSDig API might not be able to resolve records using IPv6 resolvers. For this reason, IPv6 endpoints are dedicated and ends with a `6` prefix. If your network supports IPv6 and a request is made to one of the IPv6 endpoints, the API will use IPv6 resolvers to resolve the records.
 
 On the contrary, `AAAA` records can be resolved regardless if you use the IPv6 endpoints or the regular endpoints.
 
@@ -191,4 +191,4 @@ DNSDig API also have tests for IPv6 resolvers but as of now commented from the s
 
 ## IP Geolocation
 
-DNSDig API uses [ipinfo.io](https://ipinfo.io) to geolocate IP addresses. The API is rate limited to 50,000 requests per month. The API is free to use but you need to register for an account to get an API key. When this quota is used up, DNSDig API will not include geolocation data in the response.
+DNSDig API uses [ipinfo.io](https://ipinfo.io){:target="_blank"} to geolocate IP addresses. The API is rate limited to 50,000 requests per month. The API is free to use but you need to register for an account to get an API key. When this quota is used up, DNSDig API will not include geolocation data in the response.
