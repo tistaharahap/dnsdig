@@ -188,7 +188,7 @@
   
     
   
-  Home
+  DNSDig
 
       </a>
     </li>
@@ -311,7 +311,7 @@
         
   
   <span class="md-ellipsis">
-    Home
+    DNSDig
   </span>
   
 
@@ -538,9 +538,9 @@
 
 
 <h1 id="getting-started">Getting Started</h1>
-<p>Python 3.11 is required to run this project. If you don't have it installed, you can use <a href="https://github.com/pyenv/pyenv">pyenv</a>.</p>
+<p>Python 3.11 is required to run this project. If you don't have it installed, you can use <a href="https://github.com/pyenv/pyenv" target="_blank">pyenv</a>.</p>
 <h2 id="poetry">Poetry</h2>
-<p>Dependencies are managed by <a href="https://python-poetry.org/">Poetry</a>. Install Poetry and then install the dependencies.</p>
+<p>Dependencies are managed by <a href="https://python-poetry.org/" target="_blank">Poetry</a>. Install Poetry and then install the dependencies.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>curl<span class="w"> </span>-sSL<span class="w"> </span>https://install.python-poetry.org<span class="w"> </span><span class="p">|</span><span class="w"> </span>python3.11<span class="w"> </span>-
 </span></code></pre></div>
 <h2 id="dnsdig-api">DNSDig API</h2>
@@ -550,7 +550,7 @@
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>$<span class="w"> </span>poetry<span class="w"> </span>install
 </span></code></pre></div>
 <h3 id="kinde">Kinde</h3>
-<p>Go to <a href="https://kinde.com">Kinde</a> and create an account. Then create a new project and add a new API. You'll need the Client ID, Client Secret and Kinde's host for your project to run. Included with this repo is an example <code>.env</code> file.</p>
+<p>Go to <a href="https://kinde.com" target="_blank">Kinde</a> and create an account. Then create a new project and add a new API. You'll need the Client ID, Client Secret and Kinde's host for your project to run. Included with this repo is an example <code>.env</code> file.</p>
 <p>In Kinde, add <code>http://localhost:8080/v1/callbacks/kinde</code> as a callback URL for your API.</p>
 <h3 id="env-file">.env File</h3>
 <p>Edit the <code>.env.example</code> file to include your Kinde credentials and rename it to <code>.env</code>.</p>
@@ -566,7 +566,7 @@
 <p>The API will be available at <code>http://localhost:8080</code> and the docs will be available at <code>http://localhost:8080/docs</code>.</p>
 <h4 id="protected-endpoints">Protected Endpoints</h4>
 <p>Before you can make requests to the protected endpoints, you'll need to create a user. Assuming that the API is running, use the API docs and go to the link below:</p>
-<p><a href="http://localhost:8080/docs#/Me/get_login_url_v1_me_login_url_post">http://localhost:8080/docs#/Me/get_login_url_v1_me_login_url_post</a></p>
+<p><a href="http://localhost:8080/docs#/Me/get_login_url_v1_me_login_url_post" target="_blank">http://localhost:8080/docs#/Me/get_login_url_v1_me_login_url_post</a></p>
 <p>Click the <code>Try it out</code> button, use an empty body in <code>Request Body</code> by entering <code>{}</code> and then click the <code>Execute</code> button.</p>
 <p>Note: If you're building a web frontend on top of this API, you can choose to use your own <code>state</code> parameter and the API provides a <code>store</code> parameter that you can use to store any data you want to be returned to your app after the user has logged in. </p>
 <p>In the response, you will find a <code>loginUrl</code> key, copy and paste the value to your browser. You will be redirected to Kinde's login page. After you've logged in, you will be redirected back to the API and your access token will be given in the response.</p>
@@ -777,7 +777,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home">
+          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: DNSDig">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
@@ -787,7 +787,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Home
+                DNSDig
               </div>
             </div>
           </a>

@@ -188,7 +188,7 @@
   
     
   
-  Home
+  DNSDig
 
       </a>
     </li>
@@ -311,7 +311,7 @@
         
   
   <span class="md-ellipsis">
-    Home
+    DNSDig
   </span>
   
 
@@ -565,13 +565,13 @@
 
 
 <h1 id="dnsdig-api">DNSDig API</h1>
-<p>As mentioned before, DNSDig API is built on top of <a href="https://fastapi.tiangolo.com/">FastAPI</a>, <a href="https://pydantic-docs.helpmanual.io/">Pydantic</a> and <a href="https://www.dnspython.org/">DNSPython</a>. Authentication and authorization is handled by <a href="https://kinde.com">Kinde</a>. <a href="https://www.mongodb.com">MongoDB</a> is the choice for the database and <a href="https://redis.io/">Redis</a> is used for rate limiting so far.</p>
-<p>This started as a hack and challenge to finish in 24 hours but I can say that it's still a work in progress. The API is deployed at <a href="https://dnsdig-api.bango29.com">https://dnsdig-api.bango29.com</a> and the endpoint docs are available at <a href="https://dnsdig-api.bango29.com/docs">https://dnsdig-api.bango29.com/docs</a>. The API is free to use but rate limited as described further down in this page. </p>
+<p>As mentioned before, DNSDig API is built on top of <a href="https://fastapi.tiangolo.com/" target="_blank">FastAPI</a>, <a href="https://pydantic-docs.helpmanual.io/" target="_blank">Pydantic</a> and <a href="https://www.dnspython.org/" target="_blank">DNSPython</a>. Authentication and authorization is handled by <a href="https://kinde.com" target="_blank">Kinde</a>. <a href="https://www.mongodb.com" target="_blank">MongoDB</a> is the choice for the database and <a href="https://redis.io/" target="_blank">Redis</a> is used for rate limiting so far.</p>
+<p>This started as a hack and challenge to finish in 24 hours but I can say that it's still a work in progress. The API is deployed at <a href="https://dnsdig-api.bango29.com" target="_blank">https://dnsdig-api.bango29.com</a> and the endpoint docs are available at <a href="https://dnsdig-api.bango29.com/docs" target="_blank">https://dnsdig-api.bango29.com/docs</a>. The API is free to use but rate limited as described further down in this page. </p>
 <p>Register for an account and create an application if you want to use the API without rate limits.</p>
 <h2 id="authentication-authorization">Authentication &amp; Authorization</h2>
-<p>Kinde is responsible to issue access tokens, refresh tokens and revoke tokens. DNSDig API will only accept access tokens issued by Kinde. The access token is passed in the <code>Authorization</code> header with the <code>Bearer</code> scheme. The access tokens are issued as <a href="https://jwt.io">JWT</a> tokens.</p>
+<p>Kinde is responsible to issue access tokens, refresh tokens and revoke tokens. DNSDig API will only accept access tokens issued by Kinde. The access token is passed in the <code>Authorization</code> header with the <code>Bearer</code> scheme. The access tokens are issued as <a href="https://jwt.io" target="_blank">JWT</a> tokens.</p>
 <h3 id="user-flow">User Flow</h3>
-<p>DNSDig API uses <a href="https://oauth.net/2/">OAuth 2.0</a> to authenticate users indirectly by using Kinde. The followings are sequence diagrams of how the authentication flow works. The intended audience for this flow are humans using a web browser.</p>
+<p>DNSDig API uses <a href="https://oauth.net/2/" target="_blank">OAuth 2.0</a> to authenticate users indirectly by using Kinde. The followings are sequence diagrams of how the authentication flow works. The intended audience for this flow are humans using a web browser.</p>
 <h4 id="loginregister-flow">Login/Register Flow</h4>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
@@ -636,7 +636,7 @@
     MongoDB -&gt;&gt; "DNSDig API": Respond with success
     "DNSDig API" -&gt;&gt; Machine: Responds with the access token and refresh token</code></pre>
 <h2 id="rate-limits">Rate Limits</h2>
-<p>In DNSDig, access tokens are used for certain endpoints to avoid rate limiting. Requests that are authorized with access tokens will have an unlimited rate limit from the API's perspective than requests that are not authorized with access tokens. Rate limiting authorized requests is delegated to a reverse proxy like <a href="https://nginx.org/en/">nginx</a> or <a href="https://traefik.io/">Traefik</a>. DNSDig's <a href="https://dnsdig-api.bango29.com/docs">publicly reachable API</a> is deployed behind Cloudflare, therefore Cloudflare's policy applies.</p>
+<p>In DNSDig, access tokens are used for certain endpoints to avoid rate limiting. Requests that are authorized with access tokens will have an unlimited rate limit from the API's perspective than requests that are not authorized with access tokens. Rate limiting authorized requests is delegated to a reverse proxy like <a href="https://nginx.org/en/" target="_blank">nginx</a> or <a href="https://traefik.io/" target="_blank">Traefik</a>. DNSDig's <a href="https://dnsdig-api.bango29.com/docs" target="_blank">publicly reachable API</a> is deployed behind Cloudflare, therefore Cloudflare's policy applies.</p>
 <h3 id="rate-limited-endpoints">Rate Limited Endpoints</h3>
 <p>The endpoints' rate limit is configurable via these environment variables:</p>
 <table>
@@ -659,7 +659,7 @@
 </table>
 <p><code>THROTTLER_SECONDS</code> determines the number of seconds elapsed before the rate limit is reset. <code>THROTTLER_TIMES</code> determines the number of requests allowed to be made within <code>THROTTLER_SECONDS</code> seconds.</p>
 <h3 id="implementation">Implementation</h3>
-<p>Rate limiting is implemented by using the <a href="https://github.com/long2ice/fastapi-limiter">fastapi-limiter</a> library. In practice Redis is required to maintain the state of the rate limit. The Redis connection is configured via the <code>REDIS_URL</code> environment variable. Below is taken from a public endpoint protected with the rate limiter. The <code>settings</code> variable is a Pydantic <code>BaseSettings</code> class that is used to read environment variables and or <code>.env</code> files.</p>
+<p>Rate limiting is implemented by using the <a href="https://github.com/long2ice/fastapi-limiter" target="_blank">fastapi-limiter</a> library. In practice Redis is required to maintain the state of the rate limit. The Redis connection is configured via the <code>REDIS_URL</code> environment variable. Below is taken from a public endpoint protected with the rate limiter. The <code>settings</code> variable is a Pydantic <code>BaseSettings</code> class that is used to read environment variables and or <code>.env</code> files.</p>
 <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1"> 1</a></span>
 <span class="normal"><a href="#__codelineno-0-2"> 2</a></span>
 <span class="normal"><a href="#__codelineno-0-3"> 3</a></span>
@@ -750,11 +750,11 @@
 </span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19"></a><span class="c1"># Taken from dnsdig/libshared/context.py</span>
 </span></code></pre></div></td></tr></table></div>
 <h2 id="ipv6-support">IPv6 Support</h2>
-<p>DNSDig API is built on top of <a href="https://www.dnspython.org/">dnspython</a> in which IPv6 resolvers are supported. However, depending on your own network setup, DNSDig API might not be able to resolve records using IPv6 resolvers. For this reason, IPv6 endpoints are dedicated and ends with a <code>6</code> prefix. If your network supports IPv6 and a request is made to one of the IPv6 endpoints, the API will use IPv6 resolvers to resolve the records.</p>
+<p>DNSDig API is built on top of <a href="https://www.dnspython.org/" target="_blank">dnspython</a> in which IPv6 resolvers are supported. However, depending on your own network setup, DNSDig API might not be able to resolve records using IPv6 resolvers. For this reason, IPv6 endpoints are dedicated and ends with a <code>6</code> prefix. If your network supports IPv6 and a request is made to one of the IPv6 endpoints, the API will use IPv6 resolvers to resolve the records.</p>
 <p>On the contrary, <code>AAAA</code> records can be resolved regardless if you use the IPv6 endpoints or the regular endpoints.</p>
 <p>DNSDig API also have tests for IPv6 resolvers but as of now commented from the source code. This is because Github's workflow runners does not support IPv6. If this changes then the tests will be uncommented.</p>
 <h2 id="ip-geolocation">IP Geolocation</h2>
-<p>DNSDig API uses <a href="https://ipinfo.io">ipinfo.io</a> to geolocate IP addresses. The API is rate limited to 50,000 requests per month. The API is free to use but you need to register for an account to get an API key. When this quota is used up, DNSDig API will not include geolocation data in the response.</p>
+<p>DNSDig API uses <a href="https://ipinfo.io" target="_blank">ipinfo.io</a> to geolocate IP addresses. The API is rate limited to 50,000 requests per month. The API is free to use but you need to register for an account to get an API key. When this quota is used up, DNSDig API will not include geolocation data in the response.</p>
 
 
 
