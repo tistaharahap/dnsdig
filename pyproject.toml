@@ -46,6 +46,11 @@ pytest-cov = "^4.1.0"
 typer = "^0.9.0"
 rich = "^13.6.0"
 
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.5.3"
+mkdocs-material = {extras = ["all"], version = "^9.4.7"}
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
