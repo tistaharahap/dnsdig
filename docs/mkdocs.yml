@@ -1,6 +1,13 @@
 site_name: DNSDig Docs Site
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - DNSDig API: dnsdig-api.md
+  - DNSDigd: dnsdigd.md
 theme:
   name: material
+  icon:
+    logo: material/dns-outline
   palette:
     scheme: slate
     primary: deep purple
@@ -13,6 +20,7 @@ theme:
     - navigation.tabs.sticky
     - navigation.sections
     - navigation.path
+    - navigation.footer
     - toc.follow
     - toc.integrate
     - search.suggest
@@ -42,3 +50,6 @@ extra:
       link: https://twitter.com/tista
     - icon: fontawesome/solid/blog
       link: https://bango29.com
+  generator: false
+  homepage: https://tistaharahap.github.io/dnsdig
+copyright: Made with 💚️ by <a href="https://twitter.com/tista" target="_blank">Tista</a>
