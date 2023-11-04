@@ -23,8 +23,11 @@ async def beanie_setup():
 
 
 async def limiter_setup():
+    if settings.env == Environments.Dev:
+        logger.info(f"Redis URL: {settings.mongo_url} - {settings.db_name}")
     redis_client = redis.from_url(settings.redis_url, encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(redis_client)
+    logger.info("Initializing Redis - End")
 
 
 app_params = {
